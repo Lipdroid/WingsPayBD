@@ -16,6 +16,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
@@ -50,7 +51,7 @@ public class ConcernedMarchantPickupActivity extends AppCompatActivity implement
     ModelPrint print;
     private List<ModelPrint> modelPrintList = new ArrayList<>();
     // private List<ModelPickUpSummary> modellIst = new ArrayList<>();
-
+TextView user;
     CustomModel custom;
     private RecyclerView recyclerView;
     private ConcernedPickUpAdapter mAdapter;
@@ -66,7 +67,13 @@ public class ConcernedMarchantPickupActivity extends AppCompatActivity implement
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.concerned_marchant_pickup_list);
 
+        Intent intent=getIntent();
+        id = intent.getStringExtra("id");
+        name = intent.getStringExtra("name");
+
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        user=(TextView)findViewById(R.id.username);
+
 
         logout=(Button)findViewById(R.id.logout);
         settings=(ImageView)findViewById(R.id.setting);
@@ -87,8 +94,10 @@ public class ConcernedMarchantPickupActivity extends AppCompatActivity implement
         });
 
         getSupportActionBar().hide();
-        Intent intent=getIntent();
-         id = intent.getStringExtra("id");
+
+
+
+        user.setText(name);
 
    new GetData().execute();
 

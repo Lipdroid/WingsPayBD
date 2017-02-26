@@ -66,6 +66,8 @@ ImageView settings;
     private RecyclerView recyclerView;
     private MarchantInfoAdapter mAdapter;
     LinearLayout lnrLayout;
+    String username;
+    TextView user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +80,14 @@ ImageView settings;
         ActivityCompat.requestPermissions(MarchantInfoActivity.this,
                 new String[]{Manifest.permission.CALL_PHONE},
                 1);
+
+
+        Intent intent=getIntent();
+        username = intent.getStringExtra("name");
+
+        user=(TextView)findViewById(R.id.username);
+
+        user.setText(username);
 
 
         logout=(Button)findViewById(R.id.logout);
@@ -279,7 +289,7 @@ ImageView settings;
                                                            // callIntent.setData(Uri.parse(print.getMarchent_phone1()));
 
                                                             if (ActivityCompat.checkSelfPermission(MarchantInfoActivity.this,
-                                                                    Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+                                                                    Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
 
                                                                 MarchantInfoActivity.this.startActivity(callIntent);
                                                                // return;
@@ -333,6 +343,7 @@ ImageView settings;
 
                         Intent intent = new Intent(MarchantInfoActivity.this, ConcernedMarchantPickupActivity.class);
                         intent.putExtra("id",custom.getPickupId());
+                        intent.putExtra("name",custom.getMarchent_name());
 
                       //  print.getMarchent_id();
                         startActivity(intent);
