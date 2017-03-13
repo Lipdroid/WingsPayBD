@@ -1020,9 +1020,8 @@ public class BarcodeActivity extends AppCompatActivity {
         @Override
         protected Boolean doInBackground(Void... uRls) {
 
-
+//saad
             printBarcode();
-
 
            // restcall();
             //   APICall();
