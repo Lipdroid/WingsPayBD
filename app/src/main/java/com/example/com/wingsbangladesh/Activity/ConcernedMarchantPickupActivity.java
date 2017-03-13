@@ -48,19 +48,19 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class ConcernedMarchantPickupActivity extends AppCompatActivity implements ItemClickListener {
 
-    String  URL,name,id;
-   // ModelPrint m;
+    String URL, name, id;
+    // ModelPrint m;
     ModelPrint print;
     private List<ModelPrint> modelPrintList = new ArrayList<>();
     // private List<ModelPickUpSummary> modellIst = new ArrayList<>();
-TextView user;
+    TextView user;
     CustomModel custom;
     private RecyclerView recyclerView;
     private ConcernedPickUpAdapter mAdapter;
     LinearLayout lnrLayout;
     Button logout;
     ImageView settings;
-    String usertype,userid,barcodeApi,barcodeType;
+    String usertype, userid, barcodeApi, barcodeType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +70,7 @@ TextView user;
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.concerned_marchant_pickup_list);
 
-        Intent intent=getIntent();
+        Intent intent = getIntent();
         id = intent.getStringExtra("id");
         name = intent.getStringExtra("name");
         usertype = intent.getStringExtra("usertype");
@@ -81,14 +81,14 @@ TextView user;
 
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-        user=(TextView)findViewById(R.id.username);
+        user = (TextView) findViewById(R.id.username);
 
 
-        logout=(Button)findViewById(R.id.logout);
-        settings=(ImageView)findViewById(R.id.setting);
+        logout = (Button) findViewById(R.id.logout);
+        settings = (ImageView) findViewById(R.id.setting);
 
 
-        if(usertype.equals("1")){
+        if (usertype.equals("1")) {
 
             settings.setVisibility(View.GONE);
         }
@@ -97,8 +97,8 @@ TextView user;
         settings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent=new Intent(ConcernedMarchantPickupActivity.this,SettingActivity.class);
-                intent.putExtra("userid",userid);
+                Intent intent = new Intent(ConcernedMarchantPickupActivity.this, SettingActivity.class);
+                intent.putExtra("userid", userid);
                 startActivity(intent);
 
             }
@@ -114,10 +114,9 @@ TextView user;
         getSupportActionBar().hide();
 
 
-
         user.setText(name);
 
-   new GetData().execute();
+        new GetData().execute();
 
 
         recyclerView.addOnItemTouchListener(new MarchantInfoActivity.RecyclerTouchListener(ConcernedMarchantPickupActivity.this, recyclerView, new MarchantInfoActivity.ClickListener() {
@@ -136,13 +135,13 @@ TextView user;
                     @Override
                     public void onClick(View view) {
 
-                        Intent intent=new Intent(ConcernedMarchantPickupActivity.this,BarcodeActivity.class);
-                        intent.putExtra("id",  print.getBarcodeId());
-                        intent.putExtra("barcode_token",print.getBarCode());
-                        intent.putExtra("barcodeApi",barcodeApi);
+                        Intent intent = new Intent(ConcernedMarchantPickupActivity.this, BarcodeActivity.class);
+                        intent.putExtra("id", print.getBarcodeId());
+                        intent.putExtra("barcode_token", print.getBarCode());
+                        intent.putExtra("barcodeApi", barcodeApi);
+                        intent.putExtra("barcodeType", barcodeType);
 
                         startActivity(intent);
-
 
 
                     }
@@ -156,22 +155,18 @@ TextView user;
         }));
 
 
-
-
     }
 
     @Override
-    public void onBackPressed()
-    {
+    public void onBackPressed() {
         finish();
     }
 
 
+    public void restcall() {
 
-    public void restcall(){
 
-
-        URL=barcodeApi;
+        URL = barcodeApi;
 
 
         JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.GET,
@@ -183,35 +178,51 @@ TextView user;
 
 
                         try {
-                            int success=  response.getInt("success");
-                            String message=  response.getString("message");
+                            int success = response.getInt("success");
+                            String message = response.getString("message");
 
-                           JSONArray jsonArray=response.getJSONArray("results");
-                            for(int i = 0; i < jsonArray.length(); i++) {
+                            JSONArray jsonArray = response.getJSONArray("results");
+                            for (int i = 0; i < jsonArray.length(); i++) {
                                 try {
                                     JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+                                    String barcode;
                                     // mEntries.add(jsonObject.toString());
 
+                                    if (barcodeType.equals("UPC-A Code")) {
 
-                                    String barcode_id=jsonObject.getString("barcode_id");
-                                    String paperfy_order_id=jsonObject.getString("paperfy_order_id");
-                                    String barcode=jsonObject.getString("barcode");
-                                    String marchent_code=jsonObject.getString("marchent_code");
+                                        barcode = jsonObject.getString("barcode_upca");
 
-                                    System.out.println("marchent_code::"+marchent_code);
 
-                                    ModelPrint  m=new ModelPrint();
+                                    } else if (barcodeType.equals("CODE 128")) {
+                                        barcode = jsonObject.getString("barcode_code128");
+
+                                    } else {
+                                        barcode = jsonObject.getString("barcode_itf");
+
+
+                                    }
+
+
+                                    String barcode_id = jsonObject.getString("barcode_id");
+                                    String paperfy_order_id = jsonObject.getString("paperfy_order_id");
+
+                                    String marchent_code = jsonObject.getString("marchent_code");
+
+                                    System.out.println("marchent_code::" + marchent_code);
+
+                                    ModelPrint m = new ModelPrint();
                                     m.setBarcodeId(barcode_id);
                                     m.setPaperFlyOrder(paperfy_order_id);
                                     m.setBarCode(barcode);
                                     m.setMarchentCode(marchent_code);
 
 
-                                    System.out.println("barcode::"+barcode);
+                                    System.out.println("barcode::" + barcode);
 
                                     modelPrintList.add(m);
 
-                                    System.out.println("modelPrintList::"+modelPrintList);
+                                    System.out.println("modelPrintList::" + modelPrintList);
 
 
                                     mAdapter = new ConcernedPickUpAdapter(modelPrintList);
@@ -222,8 +233,7 @@ TextView user;
 
                                     recyclerView.setAdapter(mAdapter);
 
-                                }
-                                catch(JSONException e) {
+                                } catch (JSONException e) {
                                     // mEntries.add("Error: " + e.getLocalizedMessage());
                                 }
                             }
@@ -302,7 +312,7 @@ TextView user;
         void onLongClick(View view, int position);
     }
 
-    private  class GetData extends AsyncTask<Void, Void, Boolean> {
+    private class GetData extends AsyncTask<Void, Void, Boolean> {
         SweetAlertDialog pDialog;
 
         @Override
@@ -322,9 +332,8 @@ TextView user;
         protected Boolean doInBackground(Void... uRls) {
 
 
-
             restcall();
-         //   APICall();
+            //   APICall();
 
             // uploadImage();
 
@@ -342,9 +351,6 @@ TextView user;
 
             //   prog.setVisibility(View.GONE);
             pDialog.dismiss();
-
-
-
 
 
         }

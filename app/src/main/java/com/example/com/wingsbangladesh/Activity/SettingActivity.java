@@ -149,6 +149,8 @@ public class SettingActivity extends AppCompatActivity {
 
                                 JSONObject jsonob=arr.getJSONObject(i);
 
+
+
                                 logins = jsonob.getString("login_api");
                                 marchant = jsonob.getString("merchant_api");
                                 barcode = jsonob.getString("barcode_api");

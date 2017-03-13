@@ -17,6 +17,7 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
 import android.graphics.Typeface;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -66,6 +67,8 @@ import java.util.BitSet;
 import java.util.List;
 import java.util.Set;
 
+import cn.pedant.SweetAlert.SweetAlertDialog;
+
 /**
  * Created by Mou on 2/25/2017.
  */
@@ -101,7 +104,7 @@ public class BarcodeActivity extends AppCompatActivity {
     private Button mEnableBtn;
     private Button mPrintBarcodeBtn;
     private Spinner mDeviceSp;
-    String barcodeApi;
+    String barcodeApi,barcodeType;
 
 
     private ProgressDialog mProgressDlg;
@@ -128,6 +131,8 @@ public class BarcodeActivity extends AppCompatActivity {
         barcode_token = intent.getStringExtra("barcode_token");
         id = intent.getStringExtra("id");
         barcodeApi = intent.getStringExtra("barcodeApi");
+
+        barcodeType= intent.getStringExtra("barcodeType");
 
 
         barcode_imageView = (ImageView) findViewById(R.id.barcode_img);
@@ -240,7 +245,8 @@ public class BarcodeActivity extends AppCompatActivity {
             mPrintBarcodeBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View arg0) {
-                    printBarcode();
+                   // printBarcode();
+                    new GetData().execute();
                 }
             });
 
@@ -286,7 +292,25 @@ public class BarcodeActivity extends AppCompatActivity {
 
                                     JSONObject jsonObject = jsonArray.getJSONObject(i);
 
-                                    barcode = jsonObject.getString("barcode");
+
+                                   // String barcode;
+                                    // mEntries.add(jsonObject.toString());
+
+                                    if (barcodeType.equals("UPC-A Code")) {
+
+                                        barcode = jsonObject.getString("barcode_upca");
+
+
+                                    } else if (barcodeType.equals("CODE 128")) {
+                                        barcode = jsonObject.getString("barcode_code128");
+
+                                    } else {
+                                        barcode = jsonObject.getString("barcode_itf");
+
+
+                                    }
+
+                                //    barcode = jsonObject.getString("barcode");
                                     paperfyorderid = jsonObject.getString("paperfy_order_id");
                                     marchentref = jsonObject.getString("marchent_ref");
                                     marchentcode = jsonObject.getString("marchent_code");
@@ -768,12 +792,12 @@ public class BarcodeActivity extends AppCompatActivity {
 
     private void printBarcode() {
 
-        print1DBarcode();
+       // print1DBarcode();
 
         //printImage();
 
         //Lipu experiments
-       // print_image(targetImage);
+        print_image(targetImage);
 
     }
 
@@ -976,6 +1000,54 @@ public class BarcodeActivity extends AppCompatActivity {
             }
         }
     };
+
+    private class GetData extends AsyncTask<Void, Void, Boolean> {
+        SweetAlertDialog pDialog;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+
+            pDialog = new SweetAlertDialog(BarcodeActivity.this, SweetAlertDialog.PROGRESS_TYPE);
+            pDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
+            pDialog.setTitleText("Loading");
+            pDialog.setCancelable(false);
+            pDialog.show();
+
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... uRls) {
+
+
+            printBarcode();
+
+
+           // restcall();
+            //   APICall();
+
+            // uploadImage();
+
+            return null;
+        }
+
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            super.onPostExecute(result);
+            // Dismiss the progress dialog
+            //pDialog.setVisibility(View.INVISIBLE);
+            //   prog.setVisibility(View.GONE);
+
+
+            //   prog.setVisibility(View.GONE);
+            pDialog.dismiss();
+
+
+        }
+
+    }
 
 
 }
