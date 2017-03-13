@@ -1,8 +1,11 @@
 package com.example.com.wingsbangladesh.Activity;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -14,9 +17,17 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.VolleyLog;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.com.wingsbangladesh.R;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -25,6 +36,8 @@ public class LoginActivity extends AppCompatActivity {
     String code;
     String URL;
     Button login;
+    String loginApi,marchantApi,barcodeApi,barcodeType;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +55,8 @@ public class LoginActivity extends AppCompatActivity {
         login=(Button)findViewById(R.id.login) ;
 
 
+        new GetUrlData().execute();
+
 
         login.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -50,7 +65,9 @@ public class LoginActivity extends AppCompatActivity {
                 usernameText=username.getText().toString();
                 passwordText=password.getText().toString();
 
-                APICall();
+                restcall();
+
+              //  APICall();
 
             }
         });
@@ -62,52 +79,159 @@ public class LoginActivity extends AppCompatActivity {
     {
     }
 
-    public void APICall() {
+    public void restcall(){
 
 
-      //  URL="http://paperfly.mybdweb.com/login.php/rajib/pass1234";
-
-       URL="http://paperfly.mybdweb.com/login.php/"+usernameText+"/"+passwordText;
+        URL=loginApi+usernameText+"/"+passwordText;
 
 
-        StringRequest strReq = new StringRequest(Request.Method.GET,
-                URL, new Response.Listener<String>() {
+        JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.GET,
+                URL, null,
+                new Response.Listener<JSONObject>() {
 
-            @Override
-            public void onResponse(String response) {
-              //  Log.d(TAG, response.toString());
-               // pDialog.hide();
+                    @Override
+                    public void onResponse(JSONObject response) {
 
-                System.out.println("response"+response);
 
-                if(response.toString().equals("1")){
+                        try {
+                            int success=  response.getInt("success");
+                            String message=  response.getString("message");
 
-                    Toast.makeText(LoginActivity.this, "Login is successful",
-                            Toast.LENGTH_LONG).show();
+                            JSONObject result=  response.getJSONObject("results");
 
-                    Intent intent=new Intent(LoginActivity.this,MarchantInfoActivity.class);
-                    intent.putExtra("name",usernameText);
-                    startActivity(intent);
-                }
-                else if(response.toString().equals("0")){
+                           String userid=  result.getString("user_id");
+                            String username= result.getString("username");
+                           String usertype= result.getString("usertype");
 
-                    Toast.makeText(LoginActivity.this, "Login is not successful",
-                            Toast.LENGTH_LONG).show();
-                }
+                            if(success==1){
 
-            }
-        }, new Response.ErrorListener() {
+                                Toast.makeText(LoginActivity.this, message,
+                                        Toast.LENGTH_LONG).show();
+
+                                Intent intent=new Intent(LoginActivity.this,MarchantInfoActivity.class);
+                                intent.putExtra("name",username);
+                                intent.putExtra("usertype",usertype);
+                                intent.putExtra("userid",userid);
+                                intent.putExtra("marchantApi",marchantApi);
+                                intent.putExtra("barcodeApi",barcodeApi);
+                                intent.putExtra("barcodeType",barcodeType);
+
+                                startActivity(intent);
+                            }
+                            else if(success==0){
+
+                                Toast.makeText(LoginActivity.this, message,
+                                        Toast.LENGTH_LONG).show();
+
+
+                            }
+
+
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                }, new Response.ErrorListener() {
 
             @Override
             public void onErrorResponse(VolleyError error) {
-               // VolleyLog.d(TAG, "Error: " + error.getMessage());
-                //pDialog.hide();
+
             }
         });
 
 // Adding request to request queue
         RequestQueue requestQueue = Volley.newRequestQueue(LoginActivity.this);
-        requestQueue.add(strReq);
+        requestQueue.add(jsonObjReq);
+
+    }
+
+   public void urlCall(){
+
+
+        URL="http://paperfly.mybdweb.com/get_settings.php";
+
+
+        JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.GET,
+                URL, null,
+                new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+
+
+                        try {
+                            int success=  response.getInt("success");
+                            String message=  response.getString("message");
+                            JSONArray arr=  response.getJSONArray("results");
+
+                            for(int i=0;i<arr.length();i++) {
+
+                                JSONObject jsonob=arr.getJSONObject(i);
+
+                                loginApi = jsonob.getString("login_api");
+                                marchantApi = jsonob.getString("merchant_api");
+                                barcodeApi = jsonob.getString("barcode_api");
+                                barcodeType = jsonob.getString("barcode_type");
+
+                                // System.out.println("SAAD::"+logins);
+
+                            }
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                }, new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        });
+
+// Adding request to request queue
+        RequestQueue requestQueue = Volley.newRequestQueue(LoginActivity.this);
+        requestQueue.add(jsonObjReq);
+
+    }
+
+
+    private  class GetUrlData extends AsyncTask<Void, Void, Boolean> {
+        SweetAlertDialog pDialog;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+
+            pDialog = new SweetAlertDialog(LoginActivity.this, SweetAlertDialog.PROGRESS_TYPE);
+            pDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
+            pDialog.setTitleText("Loading");
+            pDialog.setCancelable(false);
+            pDialog.show();
+
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... uRls) {
+
+            urlCall();
+
+            return null;
+        }
+
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            super.onPostExecute(result);
+
+            pDialog.dismiss();
+
+        }
+
     }
 
 }

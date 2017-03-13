@@ -5,8 +5,10 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -26,10 +28,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.com.wingsbangladesh.Model.CustomModel;
 import com.example.com.wingsbangladesh.Interface.ItemClickListener;
@@ -43,6 +47,8 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import cn.pedant.SweetAlert.SweetAlertDialog;
 
 
 /**
@@ -66,8 +72,11 @@ ImageView settings;
     private RecyclerView recyclerView;
     private MarchantInfoAdapter mAdapter;
     LinearLayout lnrLayout;
-    String username;
+    String username,usertype,userid;
     TextView user;
+
+
+    String loginApi,marchantApi,barcodeApi,barcodeType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,12 +91,24 @@ ImageView settings;
                 1);
 
 
+
+
+
         Intent intent=getIntent();
         username = intent.getStringExtra("name");
+        usertype = intent.getStringExtra("usertype");
+        userid = intent.getStringExtra("userid");
+
+        marchantApi = intent.getStringExtra("marchantApi");
+        barcodeApi = intent.getStringExtra("barcodeApi");
+        barcodeType = intent.getStringExtra("barcodeType");
+
+
 
         user=(TextView)findViewById(R.id.username);
 
         user.setText(username);
+
 
 
         logout=(Button)findViewById(R.id.logout);
@@ -100,22 +121,113 @@ ImageView settings;
 
         settings=(ImageView)findViewById(R.id.setting);
 
+        if(usertype.equals("1")){
+
+          //  settings.setVisibility(View.GONE);
+        }
+
+
         settings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent=new Intent(MarchantInfoActivity.this,SettingActivity.class);
+                intent.putExtra("userid",userid);
                 startActivity(intent);
 
             }
         });
 
 
+
+
         getSupportActionBar().hide();
 
-        APICall();
-        APICall2();
-
+  new GetData().execute();
 }
+
+
+    private  class GetUrlData extends AsyncTask<Void, Void, Boolean> {
+        SweetAlertDialog pDialog;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+
+            pDialog = new SweetAlertDialog(MarchantInfoActivity.this, SweetAlertDialog.PROGRESS_TYPE);
+            pDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
+            pDialog.setTitleText("Loading");
+            pDialog.setCancelable(false);
+            pDialog.show();
+
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... uRls) {
+
+            urlCall();
+
+            return null;
+        }
+
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            super.onPostExecute(result);
+
+            pDialog.dismiss();
+
+        }
+
+    }
+
+
+    private  class GetData extends AsyncTask<Void, Void, Boolean> {
+        SweetAlertDialog pDialog;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+
+            pDialog = new SweetAlertDialog(MarchantInfoActivity.this, SweetAlertDialog.PROGRESS_TYPE);
+            pDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
+            pDialog.setTitleText("Loading");
+            pDialog.setCancelable(false);
+            pDialog.show();
+
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... uRls) {
+
+
+
+            APICall();
+            APICall2();
+
+            return null;
+        }
+
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            super.onPostExecute(result);
+            // Dismiss the progress dialog
+            //pDialog.setVisibility(View.INVISIBLE);
+            //   prog.setVisibility(View.GONE);
+
+
+            //   prog.setVisibility(View.GONE);
+            pDialog.dismiss();
+
+
+
+
+
+        }
+
+    }
 
     @Override
     public void onBackPressed()
@@ -143,7 +255,7 @@ ImageView settings;
 
 
 
-                                 m=new ModelMarchantInfo();
+                                m=new ModelMarchantInfo();
                                 m.setMarchent_id(marchantID);
                                 m.setMarchent_name(name);
                                 m.setMarchent_address(address);
@@ -344,6 +456,11 @@ ImageView settings;
                         Intent intent = new Intent(MarchantInfoActivity.this, ConcernedMarchantPickupActivity.class);
                         intent.putExtra("id",custom.getPickupId());
                         intent.putExtra("name",custom.getMarchent_name());
+                        intent.putExtra("usertype",usertype);
+                        intent.putExtra("userid",userid);
+                        intent.putExtra("barcodeApi",barcodeApi);
+                        intent.putExtra("barcodeType",barcodeType);
+
 
                       //  print.getMarchent_id();
                         startActivity(intent);
@@ -448,6 +565,60 @@ ImageView settings;
         RequestQueue requestQueue = Volley.newRequestQueue(MarchantInfoActivity.this);
         requestQueue.add(request);
     }
+
+
+    public void urlCall(){
+
+
+        URL="http://paperfly.mybdweb.com/get_settings.php";
+
+
+        JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.GET,
+                URL, null,
+                new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+
+
+                        try {
+                            int success=  response.getInt("success");
+                            String message=  response.getString("message");
+                            JSONArray arr=  response.getJSONArray("results");
+
+                            for(int i=0;i<arr.length();i++) {
+
+                                JSONObject jsonob=arr.getJSONObject(i);
+
+                                loginApi = jsonob.getString("login_api");
+                                marchantApi = jsonob.getString("merchant_api");
+                                barcodeApi = jsonob.getString("barcode_api");
+                                barcodeType = jsonob.getString("barcode_type");
+
+                               // System.out.println("SAAD::"+logins);
+
+                            }
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                }, new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        });
+
+// Adding request to request queue
+        RequestQueue requestQueue = Volley.newRequestQueue(MarchantInfoActivity.this);
+        requestQueue.add(jsonObjReq);
+
+    }
+
+
     @Override
     public void onClick(View view, int position) {
 

@@ -19,10 +19,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.com.wingsbangladesh.Adapter.ConcernedPickUpAdapter;
 import com.example.com.wingsbangladesh.Model.CustomModel;
@@ -58,6 +60,7 @@ TextView user;
     LinearLayout lnrLayout;
     Button logout;
     ImageView settings;
+    String usertype,userid,barcodeApi,barcodeType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +73,12 @@ TextView user;
         Intent intent=getIntent();
         id = intent.getStringExtra("id");
         name = intent.getStringExtra("name");
+        usertype = intent.getStringExtra("usertype");
+        userid = intent.getStringExtra("userid");
+
+        barcodeApi = intent.getStringExtra("barcodeApi");
+        barcodeType = intent.getStringExtra("barcodeType");
+
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
         user=(TextView)findViewById(R.id.username);
@@ -78,14 +87,23 @@ TextView user;
         logout=(Button)findViewById(R.id.logout);
         settings=(ImageView)findViewById(R.id.setting);
 
+
+        if(usertype.equals("1")){
+
+            settings.setVisibility(View.GONE);
+        }
+
+
         settings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-              Intent intent=new Intent(ConcernedMarchantPickupActivity.this,SettingActivity.class);
+                Intent intent=new Intent(ConcernedMarchantPickupActivity.this,SettingActivity.class);
+                intent.putExtra("userid",userid);
                 startActivity(intent);
 
             }
         });
+
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -122,6 +140,10 @@ TextView user;
                         Intent intent=new Intent(ConcernedMarchantPickupActivity.this,BarcodeActivity.class);
                         intent.putExtra("id",  print.getBarcodeId());
                         intent.putExtra("barcode_token",print.getBarCode());
+                        intent.putExtra("barcodeApi",barcodeApi);
+
+
+
 
 
                         startActivity(intent);
@@ -150,148 +172,84 @@ TextView user;
 
 
 
-    public void APICall() {
+    public void restcall(){
 
-        URL="http://paperfly.mybdweb.com/barcode_list.php";
 
-        JsonArrayRequest request = new JsonArrayRequest(URL,
-                new Response.Listener<JSONArray>() {
+        URL=barcodeApi;
+
+
+        JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.GET,
+                URL, null,
+                new Response.Listener<JSONObject>() {
+
                     @Override
-                    public void onResponse(JSONArray jsonArray) {
-                        for(int i = 0; i < jsonArray.length(); i++) {
-                            try {
-                                JSONObject jsonObject = jsonArray.getJSONObject(i);
-                                // mEntries.add(jsonObject.toString());
+                    public void onResponse(JSONObject response) {
 
 
-                                String barcode_id=jsonObject.getString("barcode_id");
-                                String paperfy_order_id=jsonObject.getString("paperfy_order_id");
-                                String barcode=jsonObject.getString("barcode");
-                                String marchent_code=jsonObject.getString("marchent_code");
+                        try {
+                            int success=  response.getInt("success");
+                            String message=  response.getString("message");
 
-                                System.out.println("marchent_code::"+marchent_code);
-
-                                ModelPrint  m=new ModelPrint();
-                                m.setBarcodeId(barcode_id);
-                                m.setPaperFlyOrder(paperfy_order_id);
-                                m.setBarCode(barcode);
-                                m.setMarchentCode(marchent_code);
+                           JSONArray jsonArray=response.getJSONArray("results");
+                            for(int i = 0; i < jsonArray.length(); i++) {
+                                try {
+                                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                                    // mEntries.add(jsonObject.toString());
 
 
-                                System.out.println("barcode::"+barcode);
+                                    String barcode_id=jsonObject.getString("barcode_id");
+                                    String paperfy_order_id=jsonObject.getString("paperfy_order_id");
+                                    String barcode=jsonObject.getString("barcode");
+                                    String marchent_code=jsonObject.getString("marchent_code");
 
-                                modelPrintList.add(m);
+                                    System.out.println("marchent_code::"+marchent_code);
 
-                                System.out.println("modelPrintList::"+modelPrintList);
+                                    ModelPrint  m=new ModelPrint();
+                                    m.setBarcodeId(barcode_id);
+                                    m.setPaperFlyOrder(paperfy_order_id);
+                                    m.setBarCode(barcode);
+                                    m.setMarchentCode(marchent_code);
 
 
-                                mAdapter = new ConcernedPickUpAdapter(modelPrintList);
+                                    System.out.println("barcode::"+barcode);
+
+                                    modelPrintList.add(m);
+
+                                    System.out.println("modelPrintList::"+modelPrintList);
 
 
-                                RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
-                                recyclerView.setLayoutManager(mLayoutManager);
+                                    mAdapter = new ConcernedPickUpAdapter(modelPrintList);
 
-                                recyclerView.setAdapter(mAdapter);
 
+                                    RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+                                    recyclerView.setLayoutManager(mLayoutManager);
+
+                                    recyclerView.setAdapter(mAdapter);
+
+                                }
+                                catch(JSONException e) {
+                                    // mEntries.add("Error: " + e.getLocalizedMessage());
+                                }
                             }
-                            catch(JSONException e) {
-                                // mEntries.add("Error: " + e.getLocalizedMessage());
-                            }
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
 
-                        // allDone();
                     }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError volleyError) {
-                        Toast.makeText(ConcernedMarchantPickupActivity.this, "Unable to fetch data: " + volleyError.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
+                }, new Response.ErrorListener() {
 
-        // mEntries = new ArrayList<>();
-        // requestQueue.add(request);
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        });
 
 // Adding request to request queue
         RequestQueue requestQueue = Volley.newRequestQueue(ConcernedMarchantPickupActivity.this);
-        requestQueue.add(request);
+        requestQueue.add(jsonObjReq);
+
     }
-
-  /*  public void APICall() {
-
-        URL="http://paperfly.mybdweb.com/barcode_list.php/"+id;
-
-        System.out.println("URL::"+URL);
-
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET,
-                URL, null, new Response.Listener<JSONObject>(){
-                    @Override
-                    public void onResponse(JSONObject jsonObject) {
-
-
-                        System.out.println("jsonObject::"+jsonObject);
-                      //  for(int i = 0; i < jsonArray.length(); i++) {
-                            try {
-                             //  JSONObject a = jsonObject.getJSONObject();
-                                // mEntries.add(jsonObject.toString());
-
-
-                                String barcode_id=jsonObject.getString("barcode_id");
-                                String paperfy_order_id=jsonObject.getString("paperfy_order_id");
-                                String barcode=jsonObject.getString("barcodes");
-                                String marchent_code=jsonObject.getString("marchent_code");
-
-                                System.out.println("marchent_code::"+marchent_code);
-
-                                ModelPrint  m=new ModelPrint();
-                                m.setBarcodeId(barcode_id);
-                                m.setPaperFlyOrder(paperfy_order_id);
-                                m.setBarCode(barcode);
-                                m.setMarchentCode(marchent_code);
-
-
-                                System.out.println("barcode::"+barcode);
-
-                                modelPrintList.add(m);
-
-                                System.out.println("modelPrintList::"+modelPrintList);
-
-
-                                mAdapter = new ConcernedPickUpAdapter(modelPrintList);
-
-
-                                RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
-                                recyclerView.setLayoutManager(mLayoutManager);
-
-                                recyclerView.setAdapter(mAdapter);
-
-
-
-
-
-                            }
-                            catch(JSONException e) {
-                                // mEntries.add("Error: " + e.getLocalizedMessage());
-                            }
-                        }
-
-                        // allDone();
-
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError volleyError) {
-                     //   Toast.makeText(MarchantInfoActivity.this, "Unable to fetch data: " + volleyError.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
-
-        // mEntries = new ArrayList<>();
-        // requestQueue.add(request);
-
-// Adding request to request queue
-        RequestQueue requestQueue = Volley.newRequestQueue(ConcernedMarchantPickupActivity.this);
-        requestQueue.add(request);
-    }*/
 
     @Override
     public void onClick(View view, int position) {
@@ -369,8 +327,8 @@ TextView user;
 
 
 
-
-            APICall();
+            restcall();
+         //   APICall();
 
             // uploadImage();
 
