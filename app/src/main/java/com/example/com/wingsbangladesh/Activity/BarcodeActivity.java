@@ -1032,7 +1032,6 @@ public class BarcodeActivity extends AppCompatActivity {
             return null;
         }
 
-
         @Override
         protected void onPostExecute(Boolean result) {
             super.onPostExecute(result);
