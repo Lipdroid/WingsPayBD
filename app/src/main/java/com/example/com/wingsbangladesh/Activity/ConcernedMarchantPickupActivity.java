@@ -136,15 +136,10 @@ TextView user;
                     @Override
                     public void onClick(View view) {
 
-
                         Intent intent=new Intent(ConcernedMarchantPickupActivity.this,BarcodeActivity.class);
                         intent.putExtra("id",  print.getBarcodeId());
                         intent.putExtra("barcode_token",print.getBarCode());
                         intent.putExtra("barcodeApi",barcodeApi);
-
-
-
-
 
                         startActivity(intent);
 
@@ -168,6 +163,7 @@ TextView user;
     @Override
     public void onBackPressed()
     {
+        finish();
     }
 
 

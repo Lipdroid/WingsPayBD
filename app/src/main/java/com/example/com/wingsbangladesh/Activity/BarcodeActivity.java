@@ -9,6 +9,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -18,6 +19,7 @@ import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -45,17 +47,22 @@ import com.example.com.wingsbangladesh.pockdata.PocketPos;
 import com.example.com.wingsbangladesh.util.FontDefine;
 import com.example.com.wingsbangladesh.util.PrintTools_58mm;
 import com.example.com.wingsbangladesh.util.Printer;
+import com.example.com.wingsbangladesh.util.PrinterCommands;
 import com.onbarcode.barcode.android.AndroidColor;
 import com.onbarcode.barcode.android.AndroidFont;
 import com.onbarcode.barcode.android.Code128;
 import com.onbarcode.barcode.android.IBarcode;
 import com.onbarcode.barcode.android.ITF14;
 import com.onbarcode.barcode.android.UPCA;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.File;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.List;
 import java.util.Set;
 
@@ -71,7 +78,7 @@ public class BarcodeActivity extends AppCompatActivity {
     Button login;
     ModelBarcode m;
     private List<ModelBarcode> barcodeList = new ArrayList<>();
-    TextView paperfy_order_id,marchent_ref,marchent_code,product_price,customer_phone,marchent_code2;
+    TextView paperfy_order_id, marchent_ref, marchent_code, product_price, customer_phone, marchent_code2;
     String barcode_token;
     String UPCdata = "01011700062";
     //ITF24 Valid data length: 13 digits only, excluding the last checksum digit
@@ -105,6 +112,8 @@ public class BarcodeActivity extends AppCompatActivity {
     private P25Connector mConnector;
 
     private ArrayList<BluetoothDevice> mDeviceList = new ArrayList<BluetoothDevice>();
+    private BitSet dots;
+    private String TAG= "Printing by Munir";
 
 
     @Override
@@ -115,7 +124,7 @@ public class BarcodeActivity extends AppCompatActivity {
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_print);
 
-        Intent intent=getIntent();
+        Intent intent = getIntent();
         barcode_token = intent.getStringExtra("barcode_token");
         id = intent.getStringExtra("id");
         barcodeApi = intent.getStringExtra("barcodeApi");
@@ -134,13 +143,12 @@ public class BarcodeActivity extends AppCompatActivity {
         ///////////
 
 
+        mConnectBtn = (Button) findViewById(R.id.btn_connect);
+        mEnableBtn = (Button) findViewById(R.id.btn_enable);
+        mPrintBarcodeBtn = (Button) findViewById(R.id.btn_print_barcode);
+        mDeviceSp = (Spinner) findViewById(R.id.sp_device);
 
-        mConnectBtn			= (Button) findViewById(R.id.btn_connect);
-        mEnableBtn			= (Button) findViewById(R.id.btn_enable);
-        mPrintBarcodeBtn 	= (Button) findViewById(R.id.btn_print_barcode);
-        mDeviceSp 			= (Spinner) findViewById(R.id.sp_device);
-
-        mBluetoothAdapter	= BluetoothAdapter.getDefaultAdapter();
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
         if (mBluetoothAdapter == null) {
             showUnsupported();
@@ -159,7 +167,7 @@ public class BarcodeActivity extends AppCompatActivity {
                 }
             }
 
-            mProgressDlg 	= new ProgressDialog(this);
+            mProgressDlg = new ProgressDialog(this);
 
             mProgressDlg.setMessage("Scanning...");
             mProgressDlg.setCancelable(false);
@@ -172,12 +180,12 @@ public class BarcodeActivity extends AppCompatActivity {
                 }
             });
 
-            mConnectingDlg 	= new ProgressDialog(this);
+            mConnectingDlg = new ProgressDialog(this);
 
             mConnectingDlg.setMessage("Connecting...");
             mConnectingDlg.setCancelable(false);
 
-            mConnector 		= new P25Connector(new P25Connector.P25ConnectionListener() {
+            mConnector = new P25Connector(new P25Connector.P25ConnectionListener() {
 
                 @Override
                 public void onStartConnecting() {
@@ -252,12 +260,10 @@ public class BarcodeActivity extends AppCompatActivity {
     }
 
 
+    public void restcall() {
 
 
-    public void restcall(){
-
-
-        URL=barcodeApi+id;
+        URL = barcodeApi + id;
 
 
         JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.GET,
@@ -269,29 +275,29 @@ public class BarcodeActivity extends AppCompatActivity {
 
 
                         try {
-                            int success=  response.getInt("success");
-                            String message=  response.getString("message");
+                            int success = response.getInt("success");
+                            String message = response.getString("message");
 
-                            JSONArray jsonArray=response.getJSONArray("results");
-                            for(int i = 0; i < jsonArray.length(); i++) {
+                            JSONArray jsonArray = response.getJSONArray("results");
+                            for (int i = 0; i < jsonArray.length(); i++) {
                                 try {
                                     //  JSONObject a = jsonObject.getJSONObject();
                                     // mEntries.add(jsonObject.toString());
 
-                                    JSONObject jsonObject=jsonArray.getJSONObject(i);
+                                    JSONObject jsonObject = jsonArray.getJSONObject(i);
 
-                                    barcode=jsonObject.getString("barcode");
-                                    paperfyorderid=jsonObject.getString("paperfy_order_id");
-                                    marchentref=jsonObject.getString("marchent_ref");
-                                    marchentcode=jsonObject.getString("marchent_code");
-                                    productprice=jsonObject.getString("product_price");
-                                    customerphone=jsonObject.getString("customer_phone");
+                                    barcode = jsonObject.getString("barcode");
+                                    paperfyorderid = jsonObject.getString("paperfy_order_id");
+                                    marchentref = jsonObject.getString("marchent_ref");
+                                    marchentcode = jsonObject.getString("marchent_code");
+                                    productprice = jsonObject.getString("product_price");
+                                    customerphone = jsonObject.getString("customer_phone");
 
 
                                     //TextView paperfy_order_id,marchent_ref,marchent_code,product_price,customer_phone,marchent_code2;
 
-                                    view = (LinearLayout)findViewById(R.id.barcodeid);
-                                    bmImage = (ImageView)findViewById(R.id.saad);
+                                    view = (LinearLayout) findViewById(R.id.barcodeid);
+                                    bmImage = (ImageView) findViewById(R.id.saad);
 
                                     view.setDrawingCacheEnabled(true);
                                     // this is the important code :)
@@ -310,7 +316,9 @@ public class BarcodeActivity extends AppCompatActivity {
                                     view.layout(0, 0, view.getMeasuredWidth(), view.getMeasuredHeight());
 
                                     view.buildDrawingCache(true);
-                                     targetImage = Bitmap.createBitmap(view.getDrawingCache());
+
+                                    targetImage = Bitmap.createBitmap(view.getDrawingCache());
+
                                     view.setDrawingCacheEnabled(false); // clear drawing cache
 
                                     bmImage.setImageBitmap(targetImage);
@@ -335,8 +343,7 @@ public class BarcodeActivity extends AppCompatActivity {
 
                     barcodeList.add(m);
 */
-                                }
-                                catch(JSONException e) {
+                                } catch (JSONException e) {
                                     // mEntries.add("Error: " + e.getLocalizedMessage());
                                 }
                             }
@@ -361,26 +368,25 @@ public class BarcodeActivity extends AppCompatActivity {
     }
 
 
-    public  void findViewById(){
-
+    public void findViewById() {
 
 
         //barcodes=(TextView)findViewById(R.id.barcodes);
-        paperfy_order_id=(TextView)findViewById(R.id.paperfly_order_id);
+        paperfy_order_id = (TextView) findViewById(R.id.paperfly_order_id);
 
 
-        marchent_ref=(TextView)findViewById(R.id.marchant_ref);
-        marchent_code2=(TextView)findViewById(R.id.marchant_code2);
-        marchent_code=(TextView)findViewById(R.id.marchant_code);
+        marchent_ref = (TextView) findViewById(R.id.marchant_ref);
+        marchent_code2 = (TextView) findViewById(R.id.marchant_code2);
+        marchent_code = (TextView) findViewById(R.id.marchant_code);
 
 
-        product_price=(TextView)findViewById(R.id.product_price);
-        customer_phone=(TextView)findViewById(R.id.customer_phone);
+        product_price = (TextView) findViewById(R.id.product_price);
+        customer_phone = (TextView) findViewById(R.id.customer_phone);
 
 
     }
 
-   private void generateCode128Code(String Data) {
+    private void generateCode128Code(String Data) {
         //Create an image for drawing the barcodes
         Bitmap barcode_image = Bitmap.createBitmap(230, 150, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(barcode_image);
@@ -437,7 +443,7 @@ public class BarcodeActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
-       barcode_imageView.setImageBitmap(barcode_image);
+        barcode_imageView.setImageBitmap(barcode_image);
     }
 
     private void generateITFCode(String Data) {
@@ -545,7 +551,6 @@ public class BarcodeActivity extends AppCompatActivity {
         barcode_imageView.setImageBitmap(barcode_image);
 
 
-
         Paint paint = new Paint();
 
         //canvas.drawColor(Color.GREEN);
@@ -568,7 +573,6 @@ public class BarcodeActivity extends AppCompatActivity {
         //  canvas.drawBitmap(b, 10,10, paint);
 
     }
-
 
 
     @Override
@@ -618,8 +622,8 @@ public class BarcodeActivity extends AppCompatActivity {
 
         if (data == null) return list;
 
-        int size	= data.size();
-        list		= new String[size];
+        int size = data.size();
+        list = new String[size];
 
         for (int i = 0; i < size; i++) {
             list[i] = data.get(i).getName();
@@ -718,10 +722,10 @@ public class BarcodeActivity extends AppCompatActivity {
     private void createBond(BluetoothDevice device) throws Exception {
 
         try {
-            Class<?> cl 	= Class.forName("android.bluetooth.BluetoothDevice");
-            Class<?>[] par 	= {};
+            Class<?> cl = Class.forName("android.bluetooth.BluetoothDevice");
+            Class<?>[] par = {};
 
-            Method method 	= cl.getMethod("createBond", par);
+            Method method = cl.getMethod("createBond", par);
 
             method.invoke(device);
 
@@ -742,36 +746,128 @@ public class BarcodeActivity extends AppCompatActivity {
 
 
     private void print1DBarcode() {
-        String content	= UPCdata;
+        String content = UPCdata;
 
         //1D barcode format (hex): 1d 6b 02 0d + barcode data
 
-        byte[] formats	= {(byte) 0x1d, (byte) 0x6b, (byte) 0x02, (byte) 0x0d};
-        byte[] contents	= content.getBytes();
+        byte[] formats = {(byte) 0x1d, (byte) 0x6b, (byte) 0x02, (byte) 0x0d};
+        byte[] contents = content.getBytes();
 
-        byte[] bytes	= new byte[formats.length + contents.length];
+        byte[] bytes = new byte[formats.length + contents.length];
 
         System.arraycopy(formats, 0, bytes, 0, formats.length);
         System.arraycopy(contents, 0, bytes, formats.length, contents.length);
 
         sendData(bytes);
 
-        byte[] newline 	= Printer.printfont("\n\n", FontDefine.FONT_32PX,FontDefine.Align_CENTER,(byte)0x1A, PocketPos.LANGUAGE_ENGLISH);
+        byte[] newline = Printer.printfont("\n\n", FontDefine.FONT_32PX, FontDefine.Align_CENTER, (byte) 0x1A, PocketPos.LANGUAGE_ENGLISH);
 
         sendData(newline);
     }
 
 
-
     private void printBarcode() {
 
-       // print1DBarcode();
+        print1DBarcode();
 
-        printImage();
+        //printImage();
+
+        //Lipu experiments
+       // print_image(targetImage);
 
     }
 
 
+    private int mWidth = 0;
+    private int mHeight = 0;
+    private String mStatus = "not ok";
+
+
+    private void print_image(Bitmap bitmap) {
+
+            Bitmap bmp = bitmap;
+            convertBitmap(bmp);
+            //mService.write(PrinterCommands.SET_LINE_SPACING_24);
+
+            int offset = 0;
+            while (offset < bmp.getHeight()) {
+                //mService.write(PrinterCommands.SELECT_BIT_IMAGE_MODE);
+                for (int x = 0; x < bmp.getWidth(); ++x) {
+
+                    for (int k = 0; k < 3; ++k) {
+
+                        byte slice = 0;
+                        for (int b = 0; b < 8; ++b) {
+                            int y = (((offset / 8) + k) * 8) + b;
+                            int i = (y * bmp.getWidth()) + x;
+                            boolean v = false;
+                            if (i < dots.length()) {
+                                v = dots.get(i);
+                            }
+                            slice |= (byte) ((v ? 1 : 0) << (7 - b));
+                        }
+                        //mService.write(slice);
+                    }
+                }
+                offset += 24;
+//                mService.write(PrinterCommands.FEED_LINE);
+//                mService.write(PrinterCommands.FEED_LINE);
+//                mService.write(PrinterCommands.FEED_LINE);
+//                mService.write(PrinterCommands.FEED_LINE);
+//                mService.write(PrinterCommands.FEED_LINE);
+//                mService.write(PrinterCommands.FEED_LINE);
+            }
+            //mService.write(PrinterCommands.SET_LINE_SPACING_30);
+            byte[] test = new byte[(dots.length() + 7) / 8];
+
+            sendData(new byte[(dots.length() + 7) / 8]);
+
+    }
+
+
+    public String convertBitmap(Bitmap inputBitmap) {
+
+        mWidth = inputBitmap.getWidth();
+        mHeight = inputBitmap.getHeight();
+
+        convertArgbToGrayscale(inputBitmap, mWidth, mHeight);
+        mStatus = "ok";
+        return mStatus;
+    }
+
+    private void convertArgbToGrayscale(Bitmap bmpOriginal, int width,
+                                        int height) {
+        int pixel;
+        int k = 0;
+        int B = 0, G = 0, R = 0;
+        dots = new BitSet();
+        try {
+
+            for (int x = 0; x < height; x++) {
+                for (int y = 0; y < width; y++) {
+                    // get one pixel color
+                    pixel = bmpOriginal.getPixel(y, x);
+
+                    // retrieve color of all channels
+                    R = Color.red(pixel);
+                    G = Color.green(pixel);
+                    B = Color.blue(pixel);
+                    // take conversion up to one single value by calculating
+                    // pixel intensity.
+                    R = G = B = (int) (0.299 * R + 0.587 * G + 0.114 * B);
+                    // set bit into bitset, by calculating the pixel's luma
+                    if (R < 55) {
+                        dots.set(k);//this is the bitset that i'm printing
+                    }
+                    k++;
+                }
+            }
+
+        } catch (Exception e) {
+            // TODO: handle exception
+            Log.e(TAG, e.toString());
+        }
+    }
 
     private void printImage() {
         try {
@@ -797,10 +893,9 @@ public class BarcodeActivity extends AppCompatActivity {
             byte[] bytes2 = PrintTools_58mm.decodeBitmap(targetImage);
 
 
-
             sendData(bytes2);
 
-            byte[] newline 	= Printer.printfont("\n\n",FontDefine.FONT_32PX,FontDefine.Align_CENTER,(byte)0x1A,PocketPos.LANGUAGE_ENGLISH);
+            byte[] newline = Printer.printfont("\n\n", FontDefine.FONT_32PX, FontDefine.Align_CENTER, (byte) 0x1A, PocketPos.LANGUAGE_ENGLISH);
 
             sendData(newline);
         } catch (Exception e) {
@@ -827,7 +922,7 @@ public class BarcodeActivity extends AppCompatActivity {
     }*/
 
 /*
-	//print photo
+    //print photo
 	public void printPhoto() {
 		try {
 			Bitmap bmp = BitmapFactory.decodeResource(getResources(),
@@ -849,7 +944,7 @@ public class BarcodeActivity extends AppCompatActivity {
             String action = intent.getAction();
 
             if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
-                final int state 	= intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR);
+                final int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR);
 
                 if (state == BluetoothAdapter.STATE_ON) {
                     showEnabled();
@@ -881,8 +976,6 @@ public class BarcodeActivity extends AppCompatActivity {
             }
         }
     };
-
-
 
 
 }
