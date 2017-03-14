@@ -800,7 +800,7 @@ public class BarcodeActivity extends AppCompatActivity {
 
         //compress bitmap
 
-        Bitmap bitmap = Bitmap.createScaledBitmap(targetImage, 100, 100, true);
+        Bitmap bitmap = Bitmap.createScaledBitmap(targetImage, 100, 80, true);
         print_image(bitmap);
 
     }
@@ -916,7 +916,7 @@ public class BarcodeActivity extends AppCompatActivity {
             //System.arraycopy(image, 0, bytes, formats.length, image.length);
 
 
-            Bitmap bitmap = Bitmap.createScaledBitmap(targetImage, 200, 200, true);
+            Bitmap bitmap = Bitmap.createScaledBitmap(targetImage, 200, 140, true);
             print_image(bitmap);
 
             byte[] bytes2 = PrintTools_58mm.decodeBitmap(bitmap);
