@@ -55,7 +55,7 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
  * Created by sabbir on 2/22/17.
  */
 
-public class MarchantInfoActivity extends AppCompatActivity implements ItemClickListener {
+public class MarchantInfoActivity extends AppCompatActivity implements  RecyclerView.OnItemTouchListener {
 
     String  URL,name;
     ModelMarchantInfo m;
@@ -144,6 +144,21 @@ ImageView settings;
 
   new GetData().execute();
 }
+
+    @Override
+    public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
+        return false;
+    }
+
+    @Override
+    public void onTouchEvent(RecyclerView rv, MotionEvent e) {
+
+    }
+
+    @Override
+    public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+
+    }
 
 
     private  class GetUrlData extends AsyncTask<Void, Void, Boolean> {
@@ -333,9 +348,154 @@ ImageView settings;
                                 recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
                                 mAdapter = new MarchantInfoAdapter(customList,marchantList);
 
-                                recyclerView.addOnItemTouchListener(new RecyclerTouchListener(MarchantInfoActivity.this, recyclerView, new ClickListener() {
+                                recyclerView.addOnItemTouchListener(
+                                        new RecyclerItemClickListener(MarchantInfoActivity.this, new RecyclerItemClickListener.OnItemClickListener() {
+                                            @Override public void onItemClick(View view, int position) {
+                                                // TODO Handle item click
+
+
+
+                                                marchant = new ModelMarchantInfo();
+                                                marchant = marchantList.get(position);
+
+
+                                                custom=new CustomModel();
+                                                custom = customList.get(position);
+
+
+
+
+                                                //Details
+                                                lnrLayout = (LinearLayout) view.findViewById(R.id.name);
+
+                                                lnrLayout.setOnClickListener(new View.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(View view) {
+                                                        // Intent intent = new Intent(this, DetailLessonActivity.class);
+                                                        //intent.putExtra("id", lesson.getId());
+                                                        //      startActivity(intent);
+
+
+                                                        final Dialog dialog = new Dialog(MarchantInfoActivity.this);
+                                                        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                                                        dialog.setContentView(R.layout.custom_dialog);
+                                                        dialog.setTitle("Marchant Info");
+                                                        dialog.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
+
+
+                                                        TextView    name = (TextView) dialog.findViewById(R.id.text1);
+                                                        TextView  address = (TextView) dialog.findViewById(R.id.text2);
+                                                        TextView   phone = (TextView) dialog.findViewById(R.id.text3);
+
+                                                        String tempString=marchant.getMarchent_phone1();
+                                                        //TextView text=(TextView)findViewById(R.id.text);
+                                                        SpannableString spanString = new SpannableString(tempString);
+                                                        spanString.setSpan(new UnderlineSpan(), 0, spanString.length(), 0);
+                                                        spanString.setSpan(new StyleSpan(Typeface.BOLD), 0, spanString.length(), 0);
+                                                        spanString.setSpan(new StyleSpan(Typeface.ITALIC), 0, spanString.length(), 0);
+                                                        phone.setText(spanString);
+
+                                                        name.setText(marchant.getMarchent_name());
+                                                        address.setText(marchant.getMarchent_address());
+                                                        phone.setText(marchant.getMarchent_phone1());
+
+
+                                                        phone.setOnClickListener(new View.OnClickListener() {
+                                                            @Override
+                                                            public void onClick(View v) {
+
+
+
+                                                                try {
+
+
+                                                                    Intent callIntent = new Intent(Intent.ACTION_CALL);
+                                                                    //    callIntent.setPackage("com.android.server.telecom");
+
+
+                                                                    callIntent.setData(Uri.parse("tel:" + marchant.getMarchent_phone1()));
+                                                                    // callIntent.setData(Uri.parse(print.getMarchent_phone1()));
+
+                                                                    if (ActivityCompat.checkSelfPermission(MarchantInfoActivity.this,
+                                                                            Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
+
+                                                                        MarchantInfoActivity.this.startActivity(callIntent);
+                                                                        // return;
+                                                                    }
+                                                                    else{
+
+                                                                        //  Toast.makeText(getApplicationContext(), "Permission Required For calling", Toast.LENGTH_SHORT).show();
+
+                                                                    }
+
+
+                                                                } catch (Exception e) {
+                                                                    // no activity to handle intent. show error dialog/toast whatever
+                                                                }
+
+
+
+
+                                                            }
+                                                        });
+
+                                                        ImageView add = (ImageView) dialog.findViewById(R.id.close);
+
+
+
+                                                        add.setOnClickListener(new View.OnClickListener() {
+                                                            @Override
+                                                            public void onClick(View v) {
+
+                                                                dialog.dismiss();
+
+                                                                //    dailyTourPlanlist.addAll(sharedPreferencesData.getSharedPrefDailyTourPlan(Daily_Visit_Plan));
+                                                            }
+                                                        });
+
+
+                                                        dialog.show();
+
+
+                                                    }
+                                                });
+
+
+                                                //send to prcatice
+
+                                                LinearLayout send = (LinearLayout) view.findViewById(R.id.next);
+
+                                                send.setOnClickListener(new View.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(View view) {
+
+                                                        Intent intent = new Intent(MarchantInfoActivity.this, ConcernedMarchantPickupActivity.class);
+                                                        intent.putExtra("id",custom.getPickupId());
+                                                        intent.putExtra("name",custom.getMarchent_name());
+                                                        intent.putExtra("usertype",usertype);
+                                                        intent.putExtra("userid",userid);
+                                                        intent.putExtra("barcodeApi",barcodeApi);
+                                                        intent.putExtra("barcodeType",barcodeType);
+
+
+                                                        //  print.getMarchent_id();
+                                                        startActivity(intent);
+
+
+                                                    }
+                                                });
+
+                                            }
+                                        })
+                                );
+
+                                //////////////////////////
+
+                           /*
+
+                                recyclerView.addOnItemTouchListener(new RecyclerTouchListener(MarchantInfoActivity.this,new RecyclerItemClickListener.OnItemClickListener() { {
                                     @Override
-                                    public void onClick(View view, int position) {
+                                    public void onItemClick(View view, int position) {
 
 
 
@@ -478,7 +638,7 @@ ImageView settings;
 
                                     }
                                 }));
-
+*/
 
                                 RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
                                 recyclerView.setLayoutManager(mLayoutManager);
@@ -565,49 +725,38 @@ ImageView settings;
     }
 
 
-    @Override
-    public void onClick(View view, int position) {
 
 
+    public static class RecyclerItemClickListener implements RecyclerView.OnItemTouchListener {
+        private OnItemClickListener mListener;
 
-    }
+        public interface OnItemClickListener {
+            public void onItemClick(View view, int position);
+        }
 
+        GestureDetector mGestureDetector;
 
-    public static class RecyclerTouchListener implements RecyclerView.OnItemTouchListener {
-
-        private GestureDetector gestureDetector;
-        private ClickListener clickListener;
-
-        public RecyclerTouchListener(Context context, final RecyclerView recyclerView, ClickListener clickListener1) {
-            clickListener = clickListener1;
-            gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
+        public RecyclerItemClickListener(Context context, OnItemClickListener listener) {
+            mListener = listener;
+            mGestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
                 @Override
                 public boolean onSingleTapUp(MotionEvent e) {
                     return true;
-                }
-
-                @Override
-                public void onLongPress(MotionEvent e) {
-                    View child = recyclerView.findChildViewUnder(e.getX(), e.getY());
-                    if (child != null && clickListener != null) {
-                        clickListener.onLongClick(child, recyclerView.getChildPosition(child));
-                    }
                 }
             });
         }
 
         @Override
-        public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
-
-            View child = rv.findChildViewUnder(e.getX(), e.getY());
-            if (child != null && clickListener != null && gestureDetector.onTouchEvent(e)) {
-                clickListener.onClick(child, rv.getChildPosition(child));
+        public boolean onInterceptTouchEvent(RecyclerView view, MotionEvent e) {
+            View childView = view.findChildViewUnder(e.getX(), e.getY());
+            if (childView != null && mListener != null && mGestureDetector.onTouchEvent(e)) {
+                mListener.onItemClick(childView, view.getChildAdapterPosition(childView));
             }
             return false;
         }
 
         @Override
-        public void onTouchEvent(RecyclerView rv, MotionEvent e) {
+        public void onTouchEvent(RecyclerView view, MotionEvent motionEvent) {
         }
 
         @Override
@@ -616,11 +765,15 @@ ImageView settings;
         }
     }
 
-    public interface ClickListener {
-        void onClick(View view, int position);
+    private OnItemClickListener mListener;
 
-        void onLongClick(View view, int position);
+    public interface OnItemClickListener {
+        public void onItemClick(View view, int position);
     }
+
+    GestureDetector mGestureDetector;
+
+
 }
 
 

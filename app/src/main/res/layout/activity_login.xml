@@ -14,8 +14,8 @@
     <LinearLayout
         android:layout_width="250dp"
         android:layout_height="0dp"
-        android:layout_weight=".25"
-     android:padding="15dp"
+        android:layout_weight=".20"
+android:layout_margin="5sp"
     android:layout_marginLeft="35dp"
         android:layout_marginRight="35dp"
         >
@@ -34,15 +34,15 @@
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_weight=".15"
-       android:padding="5dp"
         android:layout_marginLeft="30dp"
         >
 
         <ImageView
-            android:layout_width="200dp"
+            android:layout_width="180dp"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:background="@drawable/barcode_bcg_src" />
+            android:layout_margin="15dp"
+            android:background="@drawable/barcode_bcg_src"
+            android:id="@+id/imageView" />
 
     </LinearLayout>
 
@@ -52,10 +52,10 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight=".25"
+        android:layout_weight=".20"
         android:orientation="vertical"
         android:gravity="center"
-        android:padding="20dp"
+        android:padding="10dp"
        >
 
 
@@ -85,9 +85,9 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:orientation="vertical"
-android:padding="10dp"
+        android:padding="10dp"
         android:layout_height="0dp"
-        android:layout_weight=".2"
+        android:layout_weight=".20"
         >
 
         <EditText
@@ -113,9 +113,9 @@ android:padding="10dp"
     <LinearLayout
         android:layout_width="wrap_content"
         android:orientation="vertical"
-        android:gravity="center"
+        android:gravity="top|center"
         android:layout_height="0dp"
-        android:layout_weight=".15"
+        android:layout_weight=".25"
         >
 
         <Button
@@ -128,6 +128,7 @@ android:padding="10dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:padding="5dp"
 
             >
 
