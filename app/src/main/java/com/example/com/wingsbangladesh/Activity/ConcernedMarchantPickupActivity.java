@@ -17,13 +17,11 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.com.wingsbangladesh.Adapter.ConcernedPickUpAdapter;
@@ -42,14 +40,9 @@ import java.util.List;
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
 
-/**
- * Created by sabbir on 2/22/17.
- */
-
 public class ConcernedMarchantPickupActivity extends AppCompatActivity implements ItemClickListener {
 
     String URL, name, id;
-    // ModelPrint m;
     ModelPrint print;
     private List<ModelPrint> modelPrintList = new ArrayList<>();
     // private List<ModelPickUpSummary> modellIst = new ArrayList<>();
@@ -75,7 +68,6 @@ public class ConcernedMarchantPickupActivity extends AppCompatActivity implement
         name = intent.getStringExtra("name");
         usertype = intent.getStringExtra("usertype");
         userid = intent.getStringExtra("userid");
-
         barcodeApi = intent.getStringExtra("barcodeApi");
         barcodeType = intent.getStringExtra("barcodeType");
 
@@ -108,6 +100,8 @@ public class ConcernedMarchantPickupActivity extends AppCompatActivity implement
             @Override
             public void onClick(View v) {
                 finish();
+                Intent intent=new Intent(ConcernedMarchantPickupActivity.this,LoginActivity.class);
+                startActivity(intent);
             }
         });
 
@@ -119,7 +113,7 @@ public class ConcernedMarchantPickupActivity extends AppCompatActivity implement
         new GetData().execute();
 
 
-        recyclerView.addOnItemTouchListener(new MarchantInfoActivity.RecyclerTouchListener(ConcernedMarchantPickupActivity.this, recyclerView, new MarchantInfoActivity.ClickListener() {
+        recyclerView.addOnItemTouchListener(new ConcernedMarchantPickupActivity.RecyclerTouchListener(ConcernedMarchantPickupActivity.this, recyclerView, new ConcernedMarchantPickupActivity.ClickListener() {
             @Override
             public void onClick(View view, int position) {
 
@@ -135,7 +129,7 @@ public class ConcernedMarchantPickupActivity extends AppCompatActivity implement
                     @Override
                     public void onClick(View view) {
 
-                        Intent intent = new Intent(ConcernedMarchantPickupActivity.this, BarcodeActivity.class);
+                        Intent intent = new Intent(ConcernedMarchantPickupActivity.this, PrintActivity.class);
                         intent.putExtra("id", print.getBarcodeId());
                         intent.putExtra("barcode_token", print.getBarCode());
                         intent.putExtra("barcodeApi", barcodeApi);
@@ -333,10 +327,6 @@ public class ConcernedMarchantPickupActivity extends AppCompatActivity implement
 
 
             restcall();
-            //   APICall();
-
-            // uploadImage();
-
             return null;
         }
 

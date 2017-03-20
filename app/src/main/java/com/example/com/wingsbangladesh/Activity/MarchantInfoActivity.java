@@ -408,7 +408,7 @@ ImageView settings;
                                                             }
                                                             else{
 
-                                                                Toast.makeText(getApplicationContext(), "Permission Required For calling", Toast.LENGTH_SHORT).show();
+                                                              //  Toast.makeText(getApplicationContext(), "Permission Required For calling", Toast.LENGTH_SHORT).show();
 
                                                             }
 
@@ -469,61 +469,7 @@ ImageView settings;
                     }
                 });
 
-                                           /*
 
-
-                //share kesson
-
-
-                ImageButton share = (ImageButton) view.findViewById(R.id.share);
-                //  Movie movie = movieList.get(position);
-                share.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-
-
-                        Intent sharingIntent = new Intent(Intent.ACTION_SEND);
-                        sharingIntent.setType("text/html");
-                        sharingIntent.putExtra(Intent.EXTRA_TEXT, lesson.getName() + " " + Html.fromHtml(lesson.getDescription()).toString());
-                        startActivity(Intent.createChooser(sharingIntent, "Share using"));
-
-                        //Toast.makeText(getApplicationContext(), "share" + " is selected!", Toast.LENGTH_SHORT).show();
-
-                    }
-                });
-
-
-
-
-                //copy lesson
-
-
-                ImageButton copy = (ImageButton) view.findViewById(R.id.copy);
-                //  Movie movie = movieList.get(position);
-                copy.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-
-                        int sdk = android.os.Build.VERSION.SDK_INT;
-                        if (sdk < android.os.Build.VERSION_CODES.HONEYCOMB) {
-                            android.text.ClipboardManager clipboard = (android.text.ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
-                            clipboard.setText(lesson.getName() + " " + lesson.getDescription());
-                        } else {
-                            android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
-                            android.content.ClipData clip = android.content.ClipData.newPlainText("text label", lesson.getName() + " " + Html.fromHtml(Html.fromHtml(lesson.getDescription()).toString()));
-                            clipboard.setPrimaryClip(clip);
-                        }
-
-                        Snackbar snackbar = Snackbar
-                                .make(coordinatorLayout, "Lesson copied for pasting", Snackbar.LENGTH_LONG);
-
-                        snackbar.show();
-
-                        //  Toast.makeText(getApplicationContext(), "copy" + " is selected!", Toast.LENGTH_SHORT).show();
-
-                    }
-                });
-*/
 
                                     }
 
@@ -622,11 +568,7 @@ ImageView settings;
     @Override
     public void onClick(View view, int position) {
 
-        Toast.makeText(MarchantInfoActivity.this, m.getMarchent_name()+m.getMarchent_phone1(), Toast.LENGTH_SHORT).show();
 
-        System.out.println("DDD***"+m.getMarchent_address());
-
-        Toast.makeText(MarchantInfoActivity.this, "Unable to fetch data: ", Toast.LENGTH_SHORT).show();
 
     }
 

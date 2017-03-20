@@ -46,7 +46,7 @@
 
         </activity>
 
-        <activity android:name="com.example.com.wingsbangladesh.Activity.BarcodeActivity"
+        <activity android:name="com.example.com.wingsbangladesh.Activity.PrintActivity"
             android:screenOrientation="portrait"
             >
 

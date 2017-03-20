@@ -64,8 +64,17 @@ public class LoginActivity extends AppCompatActivity {
 
                 usernameText=username.getText().toString();
                 passwordText=password.getText().toString();
+                usernameText=usernameText.trim();
+                passwordText=passwordText.trim();
+                if(usernameText!=""&&passwordText!=""&&loginApi!=null) {
 
-                restcall();
+                    restcall();
+                }
+                else{
+
+                    Toast.makeText(LoginActivity.this, "Login Failed,Try again",
+                            Toast.LENGTH_LONG).show();
+                }
 
               //  APICall();
 
@@ -97,13 +106,14 @@ public class LoginActivity extends AppCompatActivity {
                             int success=  response.getInt("success");
                             String message=  response.getString("message");
 
-                            JSONObject result=  response.getJSONObject("results");
-
-                           String userid=  result.getString("user_id");
-                            String username= result.getString("username");
-                           String usertype= result.getString("usertype");
 
                             if(success==1){
+
+                                JSONObject result=  response.getJSONObject("results");
+
+                                String userid=  result.getString("user_id");
+                                String username= result.getString("username");
+                                String usertype= result.getString("usertype");
 
                                 Toast.makeText(LoginActivity.this, message,
                                         Toast.LENGTH_LONG).show();
@@ -120,13 +130,10 @@ public class LoginActivity extends AppCompatActivity {
                             }
                             else if(success==0){
 
-                                Toast.makeText(LoginActivity.this, message,
+                                Toast.makeText(LoginActivity.this,  "Login Failed,Try again",
                                         Toast.LENGTH_LONG).show();
 
-
                             }
-
-
 
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -137,6 +144,9 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onErrorResponse(VolleyError error) {
+
+                Toast.makeText(LoginActivity.this, "Login Failed,Try again",
+                        Toast.LENGTH_LONG).show();
 
             }
         });
