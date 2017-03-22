@@ -106,6 +106,14 @@ public class PrintActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onBackPressed()
+    {
+
+        super.onBackPressed();
+        finish();
+    }
+
     public void restcall() {
 
 
@@ -426,6 +434,8 @@ public class PrintActivity extends AppCompatActivity {
 
             bitmap.recycle();
             bytes = null;
+
+            finish();
 
         } catch (Exception e) {
             e.printStackTrace();

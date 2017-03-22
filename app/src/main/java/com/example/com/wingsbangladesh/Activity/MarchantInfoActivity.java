@@ -346,7 +346,11 @@ ImageView settings;
 
 
                                 recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-                                mAdapter = new MarchantInfoAdapter(customList,marchantList);
+                                mAdapter = new MarchantInfoAdapter(customList,marchantList,usertype,userid,barcodeApi,barcodeType);
+
+
+
+
 
                                 recyclerView.addOnItemTouchListener(
                                         new RecyclerItemClickListener(MarchantInfoActivity.this, new RecyclerItemClickListener.OnItemClickListener() {
@@ -364,6 +368,7 @@ ImageView settings;
 
 
 
+/*
 
                                                 //Details
                                                 lnrLayout = (LinearLayout) view.findViewById(R.id.name);
@@ -459,11 +464,13 @@ ImageView settings;
 
                                                     }
                                                 });
+*/
 
 
                                                 //send to prcatice
 
-                                                LinearLayout send = (LinearLayout) view.findViewById(R.id.next);
+
+/*   LinearLayout send = (LinearLayout) view.findViewById(R.id.next);
 
                                                 send.setOnClickListener(new View.OnClickListener() {
                                                     @Override
@@ -483,8 +490,7 @@ ImageView settings;
 
 
                                                     }
-                                                });
-
+                                                });*/
                                             }
                                         })
                                 );

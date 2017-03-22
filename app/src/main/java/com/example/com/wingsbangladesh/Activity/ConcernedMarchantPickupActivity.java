@@ -113,41 +113,6 @@ public class ConcernedMarchantPickupActivity extends AppCompatActivity implement
         new GetData().execute();
 
 
-        recyclerView.addOnItemTouchListener(new ConcernedMarchantPickupActivity.RecyclerTouchListener(ConcernedMarchantPickupActivity.this, recyclerView, new ConcernedMarchantPickupActivity.ClickListener() {
-            @Override
-            public void onClick(View view, int position) {
-
-
-                print = new ModelPrint();
-                print = modelPrintList.get(position);
-
-
-                //Details
-                Button btn = (Button) view.findViewById(R.id.button);
-
-                btn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-
-                        Intent intent = new Intent(ConcernedMarchantPickupActivity.this, PrintActivity.class);
-                        intent.putExtra("id", print.getBarcodeId());
-                        intent.putExtra("barcode_token", print.getBarCode());
-                        intent.putExtra("barcodeApi", barcodeApi);
-                        intent.putExtra("barcodeType", barcodeType);
-
-                        startActivity(intent);
-
-
-                    }
-                });
-            }
-
-            @Override
-            public void onLongClick(View view, int position) {
-
-            }
-        }));
-
 
     }
 
@@ -219,13 +184,71 @@ public class ConcernedMarchantPickupActivity extends AppCompatActivity implement
                                     System.out.println("modelPrintList::" + modelPrintList);
 
 
-                                    mAdapter = new ConcernedPickUpAdapter(modelPrintList);
 
 
+
+
+                                    recyclerView.addOnItemTouchListener(new ConcernedMarchantPickupActivity.RecyclerTouchListener(ConcernedMarchantPickupActivity.this, recyclerView, new ConcernedMarchantPickupActivity.ClickListener() {
+                                        @Override
+                                        public void onClick(View view, int position) {
+
+
+                                            print = new ModelPrint();
+                                            print = modelPrintList.get(position);
+
+
+
+
+                                            Intent intent = new Intent(ConcernedMarchantPickupActivity.this, PrintActivity.class);
+                                            intent.putExtra("id", print.getBarcodeId());
+                                            intent.putExtra("barcode_token", print.getBarCode());
+                                            intent.putExtra("barcodeApi", barcodeApi);
+                                            intent.putExtra("barcodeType", barcodeType);
+
+                                            startActivity(intent);
+
+
+            /*    //Details
+                Button btn = (Button) view.findViewById(R.id.button);
+
+                btn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+
+
+
+
+                        Intent intent = new Intent(ConcernedMarchantPickupActivity.this, PrintActivity.class);
+                        intent.putExtra("id", print.getBarcodeId());
+                        intent.putExtra("barcode_token", print.getBarCode());
+                        intent.putExtra("barcodeApi", barcodeApi);
+                        intent.putExtra("barcodeType", barcodeType);
+
+                        startActivity(intent);
+
+
+                    }
+                });*/
+                                        }
+
+                                        @Override
+                                        public void onLongClick(View view, int position) {
+
+                                        }
+                                    }));
+
+
+
+
+
+
+                                    mAdapter = new ConcernedPickUpAdapter(modelPrintList,barcodeApi,barcodeType);
                                     RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
                                     recyclerView.setLayoutManager(mLayoutManager);
-
                                     recyclerView.setAdapter(mAdapter);
+
+
+
 
                                 } catch (JSONException e) {
                                     // mEntries.add("Error: " + e.getLocalizedMessage());
