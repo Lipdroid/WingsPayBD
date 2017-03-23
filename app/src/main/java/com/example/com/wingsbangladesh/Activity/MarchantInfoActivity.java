@@ -87,7 +87,7 @@ public class MarchantInfoActivity extends AppCompatActivity implements  Recycler
     String username,password,usertype,userName;
     TextView user;
 
-
+//
     String loginApi,marchantApi,barcodeApi,barcodeType;
 
     @Override
