@@ -402,7 +402,7 @@ public class LoginActivity extends AppCompatActivity {
 
         public PostTask() {
         }
-
+//
         @Override
         protected String  doInBackground(String[]... data) {
             // Create a new HttpClient and Post Header
@@ -412,8 +412,8 @@ public class LoginActivity extends AppCompatActivity {
             try {
                 //add data
                 List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
-                nameValuePairs.add(new BasicNameValuePair("username", "testa"));
-                nameValuePairs.add(new BasicNameValuePair("pass", "testa$"));
+                nameValuePairs.add(new BasicNameValuePair("username", usernameText));
+                nameValuePairs.add(new BasicNameValuePair("pass", passwordText));
 
                 httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
                 //execute http post
