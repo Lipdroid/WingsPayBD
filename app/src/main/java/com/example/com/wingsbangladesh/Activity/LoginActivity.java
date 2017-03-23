@@ -130,12 +130,17 @@ public class LoginActivity extends AppCompatActivity {
                     JSONObject obj = jsonarray.getJSONObject(i);
 
                     String name = obj.getString("usrname");
-                    String pass = obj.getString("type");
+                    String type = obj.getString("type");
                     String empName = obj.getString("empName");
 
-                    System.out.println("saadname" + name);
-                    System.out.println("saadpass" + pass);
-                    System.out.println("empName" + pass);
+
+                    Intent intent=new Intent(LoginActivity.this,MarchantInfoActivity.class);
+                    intent.putExtra("usrname",name);
+                    intent.putExtra("pass",passwordText);
+                    intent.putExtra("type",type);
+                    intent.putExtra("empName",empName);
+                    startActivity(intent);
+
                 }
 
 

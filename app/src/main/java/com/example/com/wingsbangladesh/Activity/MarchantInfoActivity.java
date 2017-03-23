@@ -17,6 +17,7 @@ import android.support.v7.widget.RecyclerView;
 import android.text.SpannableString;
 import android.text.style.StyleSpan;
 import android.text.style.UnderlineSpan;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -41,10 +42,21 @@ import com.example.com.wingsbangladesh.Adapter.MarchantInfoAdapter;
 import com.example.com.wingsbangladesh.Model.ModelMarchantInfo;
 import com.example.com.wingsbangladesh.R;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,7 +75,7 @@ public class MarchantInfoActivity extends AppCompatActivity implements  Recycler
     String marchantID;
     Button logout;
     String pickUpId;
-ImageView settings;
+    ImageView settings;
     private List<ModelMarchantInfo> marchantList = new ArrayList<>();
    // private List<ModelPickUpSummary> modellIst = new ArrayList<>();
     private List<CustomModel> customList = new ArrayList<>();
@@ -72,7 +84,7 @@ ImageView settings;
     private RecyclerView recyclerView;
     private MarchantInfoAdapter mAdapter;
     LinearLayout lnrLayout;
-    String username,usertype,userid;
+    String username,password,usertype,userName;
     TextView user;
 
 
@@ -91,24 +103,16 @@ ImageView settings;
                 1);
 
 
-
-
-
         Intent intent=getIntent();
-        username = intent.getStringExtra("name");
-        usertype = intent.getStringExtra("usertype");
-        userid = intent.getStringExtra("userid");
 
-        marchantApi = intent.getStringExtra("marchantApi");
-        barcodeApi = intent.getStringExtra("barcodeApi");
-        barcodeType = intent.getStringExtra("barcodeType");
-
+        username = intent.getStringExtra("usrname");
+        password = intent.getStringExtra("pass");
+        usertype = intent.getStringExtra("type");
+        userName = intent.getStringExtra("empName");
 
 
         user=(TextView)findViewById(R.id.username);
-
         user.setText(username);
-
 
 
         logout=(Button)findViewById(R.id.logout);
@@ -121,7 +125,7 @@ ImageView settings;
 
         settings=(ImageView)findViewById(R.id.setting);
 
-        if(usertype.equals("1")){
+        if(usertype.equals("Employee")){
 
           //  settings.setVisibility(View.GONE);
         }
@@ -131,7 +135,7 @@ ImageView settings;
             @Override
             public void onClick(View view) {
                 Intent intent=new Intent(MarchantInfoActivity.this,SettingActivity.class);
-                intent.putExtra("userid",userid);
+              //  intent.putExtra("userid",userid);
                 startActivity(intent);
 
             }
@@ -142,7 +146,7 @@ ImageView settings;
 
         getSupportActionBar().hide();
 
-  new GetData().execute();
+  new PostTask().execute();
 }
 
     @Override
@@ -161,43 +165,7 @@ ImageView settings;
     }
 
 
-    private  class GetUrlData extends AsyncTask<Void, Void, Boolean> {
-        SweetAlertDialog pDialog;
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-
-
-            pDialog = new SweetAlertDialog(MarchantInfoActivity.this, SweetAlertDialog.PROGRESS_TYPE);
-            pDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
-            pDialog.setTitleText("Loading");
-            pDialog.setCancelable(false);
-            pDialog.show();
-
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... uRls) {
-
-            urlCall();
-
-            return null;
-        }
-
-
-        @Override
-        protected void onPostExecute(Boolean result) {
-            super.onPostExecute(result);
-
-            pDialog.dismiss();
-
-        }
-
-    }
-
-
-    private  class GetData extends AsyncTask<Void, Void, Boolean> {
+/* private  class GetData extends AsyncTask<Void, Void, Boolean> {
         SweetAlertDialog pDialog;
 
         @Override
@@ -242,14 +210,62 @@ ImageView settings;
 
         }
 
-    }
+    }*/
+
+
+   /* private  class GetData extends AsyncTask<Void, Void, Boolean> {
+        SweetAlertDialog pDialog;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+
+            pDialog = new SweetAlertDialog(MarchantInfoActivity.this, SweetAlertDialog.PROGRESS_TYPE);
+            pDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
+            pDialog.setTitleText("Loading");
+            pDialog.setCancelable(false);
+            pDialog.show();
+
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... uRls) {
+
+
+
+            APICall();
+            APICall2();
+
+            return null;
+        }
+
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            super.onPostExecute(result);
+            // Dismiss the progress dialog
+            //pDialog.setVisibility(View.INVISIBLE);
+            //   prog.setVisibility(View.GONE);
+
+
+            //   prog.setVisibility(View.GONE);
+            pDialog.dismiss();
+
+
+
+
+
+        }
+
+    }*/
 
     @Override
     public void onBackPressed()
     {
     }
 
-    public void APICall() {
+/*    public void APICall() {
 
         URL="http://paperfly.mybdweb.com/marchant_info.php";
 
@@ -324,10 +340,10 @@ ImageView settings;
                                String l_s_splus_order_count= jsonObject.getString("l_s_splus_order_count");
                                String express_order_count= jsonObject.getString("express_order_count");
 
-                               /* ModelPickUpSummary m=new ModelPickUpSummary();
+                               *//* ModelPickUpSummary m=new ModelPickUpSummary();
                                 m.setTotal_order_count(total_order_count);
                                 m.setL_s_splus_order_count(l_s_splus_order_count);
-                                m.setExpress_order_count(express_order_count);*/
+                                m.setExpress_order_count(express_order_count);*//*
 
 
                                // System.out.println("marchantListPhone"+marchantList.get(i).getMarchent_phone1());
@@ -368,7 +384,7 @@ ImageView settings;
 
 
 
-/*
+*//*
 
                                                 //Details
                                                 lnrLayout = (LinearLayout) view.findViewById(R.id.name);
@@ -464,13 +480,13 @@ ImageView settings;
 
                                                     }
                                                 });
-*/
+*//*
 
 
                                                 //send to prcatice
 
 
-/*   LinearLayout send = (LinearLayout) view.findViewById(R.id.next);
+*//*   LinearLayout send = (LinearLayout) view.findViewById(R.id.next);
 
                                                 send.setOnClickListener(new View.OnClickListener() {
                                                     @Override
@@ -490,14 +506,14 @@ ImageView settings;
 
 
                                                     }
-                                                });*/
+                                                });*//*
                                             }
                                         })
                                 );
 
                                 //////////////////////////
 
-                           /*
+                           *//*
 
                                 recyclerView.addOnItemTouchListener(new RecyclerTouchListener(MarchantInfoActivity.this,new RecyclerItemClickListener.OnItemClickListener() { {
                                     @Override
@@ -644,7 +660,7 @@ ImageView settings;
 
                                     }
                                 }));
-*/
+*//*
 
                                 RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
                                 recyclerView.setLayoutManager(mLayoutManager);
@@ -676,10 +692,10 @@ ImageView settings;
 // Adding request to request queue
         RequestQueue requestQueue = Volley.newRequestQueue(MarchantInfoActivity.this);
         requestQueue.add(request);
-    }
+    }*/
 
 
-    public void urlCall(){
+   /* public void urlCall(){
 
 
         URL="http://paperfly.mybdweb.com/get_settings.php";
@@ -728,7 +744,7 @@ ImageView settings;
         RequestQueue requestQueue = Volley.newRequestQueue(MarchantInfoActivity.this);
         requestQueue.add(jsonObjReq);
 
-    }
+    }*/
 
 
 
@@ -778,6 +794,66 @@ ImageView settings;
     }
 
     GestureDetector mGestureDetector;
+
+
+    private class PostTask extends AsyncTask<String[], String, String> {
+
+        public PostTask() {
+        }
+
+        //
+        @Override
+        protected String doInBackground(String[]... data) {
+            // Create a new HttpClient and Post Header
+            HttpClient httpclient = new DefaultHttpClient();
+            HttpPost httppost = new HttpPost("http://paperfly.com.bd/merchantAPI.php");
+
+            try {
+
+                //add data
+                List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+                nameValuePairs.add(new BasicNameValuePair("username", username));
+                nameValuePairs.add(new BasicNameValuePair("pass", password));
+
+                httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+                //execute http post
+                HttpResponse response = httpclient.execute(httppost);
+
+                HttpEntity httpEntity = response.getEntity();
+                String mJson = EntityUtils.toString(httpEntity);
+
+                Log.e("MarchantResponse", mJson.toString());
+
+                JSONArray jsonarray = new JSONArray(mJson);
+
+
+             /*   for (int i = 0; i < jsonarray.length(); i++) {
+                    JSONObject obj = jsonarray.getJSONObject(i);
+
+                    String name = obj.getString("usrname");
+                    String type = obj.getString("type");
+                    String empName = obj.getString("empName");
+
+
+                    Intent intent=new Intent();
+                    intent.putExtra("usrname",name);
+                    intent.putExtra("type",type);
+                    intent.putExtra("empName",empName);
+                    startActivity(intent);
+
+                }*/
+
+
+            } catch (ClientProtocolException e) {
+                Log.e("Response", e.toString());
+            } catch (IOException e) {
+                Log.e("Response", e.toString());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return "";
+        }
+    }
 
 
 }
