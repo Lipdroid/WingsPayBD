@@ -13,19 +13,37 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.com.wingsbangladesh.R;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -55,7 +73,7 @@ public class LoginActivity extends AppCompatActivity {
         login=(Button)findViewById(R.id.login) ;
 
 
-        new GetUrlData().execute();
+     //   new GetUrlData().execute();
 
 
         login.setOnClickListener(new View.OnClickListener() {
@@ -66,17 +84,20 @@ public class LoginActivity extends AppCompatActivity {
                 passwordText=password.getText().toString();
                 usernameText=usernameText.trim();
                 passwordText=passwordText.trim();
-                if(usernameText!=""&&passwordText!=""&&loginApi!=null) {
+             //   if(usernameText!=""&&passwordText!=""&&loginApi!=null) {
 
-                    restcall();
-                }
-                else{
+                  //  test();
+               // }
+                //else{
 
-                    Toast.makeText(LoginActivity.this, "Login Failed,Try again",
-                            Toast.LENGTH_LONG).show();
-                }
+                //}
 
               //  APICall();
+
+               // APIPost();
+
+                String[] data = {"testa","testa$"};
+                new PostTask().execute(data);
 
             }
         });
@@ -88,20 +109,150 @@ public class LoginActivity extends AppCompatActivity {
     {
     }
 
+
+
+
+    public void APIPost() {
+
+
+        URL="http://paperfly.com.bd/la.php";
+        Map<String, String> jsonParams = new HashMap<String, String>();
+
+
+        // jsonParams.put("Authorization", token);
+        jsonParams.put("username", usernameText);
+        jsonParams.put("pass", passwordText);
+
+
+
+        JsonObjectRequest myRequest = new JsonObjectRequest(
+                Request.Method.POST,
+                URL,
+                new JSONObject(jsonParams),
+
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+
+
+                        // result= response.getJSONObject("results");
+
+                        //token = response.getString("token");
+
+
+                        //  System.out.println("token:::" + token+"   :::");*//*
+                        //   verificationSuccess(response);
+
+                        System.out.println("responseSAAD:::" + response + "   :::");
+
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        //  verificationFailed(error);
+                        Log.e("errorsaad",String.valueOf(error));
+                    }
+                }) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+
+
+                headers.put("Content-Type", "application/json; charset=utf-8");
+                headers.put("User-agent", "My useragent");
+                return headers;
+            }
+
+
+        };
+
+        RequestQueue requestQueue = Volley.newRequestQueue(LoginActivity.this);
+        requestQueue.add(myRequest);
+        //  MyApplication.getInstance().addToRequestQueue(myRequest, "tag");
+
+    }
+
+    public void test(){
+
+        URL="http://paperfly.com.bd/la.php";
+
+
+        // Creating the JsonArrayRequest class called arrayreq, passing the required parameters
+        //JsonURL is the URL to be fetched from
+        JsonArrayRequest myRequest = new JsonArrayRequest(URL,
+                // The second parameter Listener overrides the method onResponse() and passes
+                //JSONArray as a parameter
+                new Response.Listener<JSONArray>() {
+
+                    // Takes the response from the JSON request
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        try {
+                            // Retrieves first JSON object in outer array
+                            JSONObject data = response.getJSONObject(0);
+
+                          String usrname=  data.getString("usrname");
+                            String type=  data.getString("type");
+                            String empName=  data.getString("empName");
+
+
+                            System.out.println("saad222"+usrname);
+
+                        }
+                        // Try and catch are included to handle any errors due to JSON
+                        catch (JSONException e) {
+                            // If an error occurs, this prints the error to the log
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                // The final parameter overrides the method onErrorResponse() and passes VolleyError
+                //as a parameter
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        //  verificationFailed(error);
+                    }
+                })  {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+
+                headers.put("username", usernameText);
+                headers.put("pass", passwordText);
+                return headers;
+            }
+
+
+        };
+
+
+        RequestQueue requestQueue = Volley.newRequestQueue(LoginActivity.this);
+        requestQueue.add(myRequest);
+
+        // Adds the JSON array request "arrayreq" to the request queue
+      //  requestQueue.add(arrayreq);
+    }
+
     public void restcall(){
 
 
-        URL=loginApi+usernameText+"/"+passwordText;
+       // URL=loginApi+usernameText+"/"+passwordText;
+
+        URL="http://paperfly.com.bd/la.php";
 
 
-        JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.GET,
+        JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.POST,
                 URL, null,
                 new Response.Listener<JSONObject>() {
 
                     @Override
                     public void onResponse(JSONObject response) {
 
-//
+
                         try {
                             int success=  response.getInt("success");
                             String message=  response.getString("message");
@@ -154,6 +305,8 @@ public class LoginActivity extends AppCompatActivity {
 // Adding request to request queue
         RequestQueue requestQueue = Volley.newRequestQueue(LoginActivity.this);
         requestQueue.add(jsonObjReq);
+
+
 
     }
 
@@ -242,6 +395,42 @@ public class LoginActivity extends AppCompatActivity {
 
         }
 
+    }
+
+
+    private class PostTask extends AsyncTask<String[], String, String> {
+
+        public PostTask() {
+        }
+
+        @Override
+        protected String  doInBackground(String[]... data) {
+            // Create a new HttpClient and Post Header
+            HttpClient httpclient = new DefaultHttpClient();
+            HttpPost httppost = new HttpPost("http://paperfly.com.bd/la.php");
+
+            try {
+                //add data
+                List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+                nameValuePairs.add(new BasicNameValuePair("username", "testa"));
+                nameValuePairs.add(new BasicNameValuePair("pass", "testa$"));
+
+                httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+                //execute http post
+                HttpResponse response = httpclient.execute(httppost);
+
+                HttpEntity httpEntity = response.getEntity();
+                String mJson = EntityUtils.toString(httpEntity);
+
+                Log.e("Response",response.toString());
+
+            } catch (ClientProtocolException e) {
+                Log.e("Response",e.toString());
+            } catch (IOException e) {
+                Log.e("Response",e.toString());
+            }
+            return "";
+        }
     }
 
 }
