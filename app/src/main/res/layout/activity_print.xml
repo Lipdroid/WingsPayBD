@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-
+android:id="@+id/mother"
     android:orientation="vertical">
 
     <LinearLayout
@@ -71,8 +71,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="232131232133"
-            android:textSize="25dp"
-            android:textStyle="bold" />
+            android:textSize="35dp"
+            android:textStyle="bold"
+            android:textColor="@color/colorBlack"
+            />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -84,22 +86,26 @@
                 android:id="@+id/marchant_ref"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="2dp"
+                android:padding="5dp"
+                android:textStyle="bold"
                 android:text="2321312323"
-                android:textSize="15dp" />
+                android:textColor="@color/colorBlack"
+                android:textSize="20dp" />
 
             <View
-                android:layout_width="1dp"
-                android:layout_height="20dp"
-                android:background="#848181" />
+                android:layout_width="3dp"
+                android:layout_height="25dp"
+                android:background="@color/colorBlack" />
 
             <TextView
                 android:id="@+id/marchant_code"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="2dp"
+                android:padding="5dp"
+                android:textStyle="bold"
                 android:text="232131232133"
-                android:textSize="15dp" />
+                android:textColor="@color/colorBlack"
+                android:textSize="20dp" />
 
         </LinearLayout>
 
@@ -113,28 +119,32 @@
                 android:id="@+id/product_price"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="2dp"
+                android:padding="5dp"
                 android:text="232131232133"
-                android:textSize="15dp" />
+                android:textColor="@color/colorBlack"
+                android:textStyle="bold"
+                android:textSize="20dp" />
 
             <View
-                android:layout_width="1dp"
-                android:layout_height="20dp"
-                android:background="#848181" />
+                android:layout_width="3dp"
+                android:layout_height="25dp"
+                android:background="@color/colorBlack" />
 
             <TextView
                 android:id="@+id/customer_phone"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="2dp"
+                android:padding="5dp"
                 android:text="232131232133"
-                android:textSize="15dp" />
+                android:textStyle="bold"
+                android:textColor="@color/colorBlack"
+                android:textSize="20dp" />
 
         </LinearLayout>
 
         <ImageView
             android:id="@+id/barcode_img"
-            android:layout_width="120dp"
+            android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:padding="5dp" />
 
@@ -143,6 +153,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
+            android:textColor="@color/colorBlack"
             android:text="232131232133"
             android:textSize="12dp" />
 

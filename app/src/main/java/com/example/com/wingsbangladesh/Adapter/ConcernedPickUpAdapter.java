@@ -1,6 +1,7 @@
 package com.example.com.wingsbangladesh.Adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -10,6 +11,8 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.com.wingsbangladesh.Activity.ConcernedMarchantPickupActivity;
+import com.example.com.wingsbangladesh.Activity.PrintActivity;
 import com.example.com.wingsbangladesh.Interface.ItemClickListener;
 import com.example.com.wingsbangladesh.Model.ModelMarchantInfo;
 import com.example.com.wingsbangladesh.Model.ModelPrint;
@@ -29,13 +32,17 @@ public class ConcernedPickUpAdapter extends RecyclerView.Adapter<ConcernedPickUp
     LinearLayout one,two,three;
     ModelMarchantInfo m2;
     private ItemClickListener clickListener;
+    ModelPrint print;
+    String barcodeApi,barcodeType;
+    ModelPrint m;
+
 
 
 
     public class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public TextView textView1,textView2;
         public Button button;
-
+        Button btn;
         public MyViewHolder(View view) {
             super(view);
             textView1 = (TextView) view.findViewById(R.id.text1);
@@ -45,6 +52,8 @@ public class ConcernedPickUpAdapter extends RecyclerView.Adapter<ConcernedPickUp
             one = (LinearLayout) view.findViewById(R.id.name);
             two = (LinearLayout) view.findViewById(R.id.two);
             three = (LinearLayout) view.findViewById(R.id.three);
+
+             btn = (Button) view.findViewById(R.id.button);
 
             view.setTag(view);
             view.setOnClickListener(this);
@@ -59,9 +68,11 @@ public class ConcernedPickUpAdapter extends RecyclerView.Adapter<ConcernedPickUp
     }
 
 
-    public ConcernedPickUpAdapter(List<ModelPrint> List) {
-        this.marchantlist = List;
+    public ConcernedPickUpAdapter(List<ModelPrint> List,String barcodeApi,String barcodeType) {
 
+        this.marchantlist = List;
+        this.barcodeApi = barcodeApi;
+        this.barcodeType = barcodeType;
 
     }
 
@@ -77,6 +88,8 @@ public class ConcernedPickUpAdapter extends RecyclerView.Adapter<ConcernedPickUp
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
+
+
 
         if((position%2)==0)
         {
@@ -96,11 +109,29 @@ public class ConcernedPickUpAdapter extends RecyclerView.Adapter<ConcernedPickUp
 
 
         }
-        ModelPrint m = marchantlist.get(position);
+         m = marchantlist.get(position);
 
         holder.textView1.setText(m.getPaperFlyOrder());
         holder.textView2.setText(m.getBarCode());
       //  holder.textView3.setText(m.getMarchentCode());
+
+
+      /*  holder.btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent intent = new Intent(context, PrintActivity.class);
+                intent.putExtra("id", m.getBarcodeId());
+                intent.putExtra("barcode_token", m.getBarCode());
+                intent.putExtra("barcodeApi", barcodeApi);
+                intent.putExtra("barcodeType", barcodeType);
+
+
+                System.out.println("SAAD"+m.getBarcodeId()+"     "+m.getBarCode()+"     "+barcodeApi+"    "+barcodeType);
+
+                context.startActivity(intent);
+            }
+        });*/
 
 
     }

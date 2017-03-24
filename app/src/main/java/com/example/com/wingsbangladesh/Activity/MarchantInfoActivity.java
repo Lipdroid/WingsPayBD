@@ -17,6 +17,7 @@ import android.support.v7.widget.RecyclerView;
 import android.text.SpannableString;
 import android.text.style.StyleSpan;
 import android.text.style.UnderlineSpan;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -41,10 +42,21 @@ import com.example.com.wingsbangladesh.Adapter.MarchantInfoAdapter;
 import com.example.com.wingsbangladesh.Model.ModelMarchantInfo;
 import com.example.com.wingsbangladesh.R;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,7 +67,7 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
  * Created by sabbir on 2/22/17.
  */
 
-public class MarchantInfoActivity extends AppCompatActivity implements ItemClickListener {
+public class MarchantInfoActivity extends AppCompatActivity implements  RecyclerView.OnItemTouchListener {
 
     String  URL,name;
     ModelMarchantInfo m;
@@ -63,7 +75,7 @@ public class MarchantInfoActivity extends AppCompatActivity implements ItemClick
     String marchantID;
     Button logout;
     String pickUpId;
-ImageView settings;
+    ImageView settings;
     private List<ModelMarchantInfo> marchantList = new ArrayList<>();
    // private List<ModelPickUpSummary> modellIst = new ArrayList<>();
     private List<CustomModel> customList = new ArrayList<>();
@@ -72,10 +84,10 @@ ImageView settings;
     private RecyclerView recyclerView;
     private MarchantInfoAdapter mAdapter;
     LinearLayout lnrLayout;
-    String username,usertype,userid;
+    String username,password,usertype,userName;
     TextView user;
 
-
+//
     String loginApi,marchantApi,barcodeApi,barcodeType;
 
     @Override
@@ -91,24 +103,16 @@ ImageView settings;
                 1);
 
 
-
-
-
         Intent intent=getIntent();
-        username = intent.getStringExtra("name");
-        usertype = intent.getStringExtra("usertype");
-        userid = intent.getStringExtra("userid");
 
-        marchantApi = intent.getStringExtra("marchantApi");
-        barcodeApi = intent.getStringExtra("barcodeApi");
-        barcodeType = intent.getStringExtra("barcodeType");
-
+        username = intent.getStringExtra("usrname");
+        password = intent.getStringExtra("pass");
+        usertype = intent.getStringExtra("type");
+        userName = intent.getStringExtra("empName");
 
 
         user=(TextView)findViewById(R.id.username);
-
         user.setText(username);
-
 
 
         logout=(Button)findViewById(R.id.logout);
@@ -121,7 +125,7 @@ ImageView settings;
 
         settings=(ImageView)findViewById(R.id.setting);
 
-        if(usertype.equals("1")){
+        if(usertype.equals("Employee")){
 
           //  settings.setVisibility(View.GONE);
         }
@@ -131,7 +135,7 @@ ImageView settings;
             @Override
             public void onClick(View view) {
                 Intent intent=new Intent(MarchantInfoActivity.this,SettingActivity.class);
-                intent.putExtra("userid",userid);
+              //  intent.putExtra("userid",userid);
                 startActivity(intent);
 
             }
@@ -142,47 +146,26 @@ ImageView settings;
 
         getSupportActionBar().hide();
 
-  new GetData().execute();
+  new PostTask().execute();
 }
 
+    @Override
+    public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
+        return false;
+    }
 
-    private  class GetUrlData extends AsyncTask<Void, Void, Boolean> {
-        SweetAlertDialog pDialog;
+    @Override
+    public void onTouchEvent(RecyclerView rv, MotionEvent e) {
 
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
+    }
 
-
-            pDialog = new SweetAlertDialog(MarchantInfoActivity.this, SweetAlertDialog.PROGRESS_TYPE);
-            pDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
-            pDialog.setTitleText("Loading");
-            pDialog.setCancelable(false);
-            pDialog.show();
-
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... uRls) {
-
-            urlCall();
-
-            return null;
-        }
-
-
-        @Override
-        protected void onPostExecute(Boolean result) {
-            super.onPostExecute(result);
-
-            pDialog.dismiss();
-
-        }
+    @Override
+    public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
 
     }
 
 
-    private  class GetData extends AsyncTask<Void, Void, Boolean> {
+/* private  class GetData extends AsyncTask<Void, Void, Boolean> {
         SweetAlertDialog pDialog;
 
         @Override
@@ -227,14 +210,62 @@ ImageView settings;
 
         }
 
-    }
+    }*/
+
+
+   /* private  class GetData extends AsyncTask<Void, Void, Boolean> {
+        SweetAlertDialog pDialog;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+
+            pDialog = new SweetAlertDialog(MarchantInfoActivity.this, SweetAlertDialog.PROGRESS_TYPE);
+            pDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
+            pDialog.setTitleText("Loading");
+            pDialog.setCancelable(false);
+            pDialog.show();
+
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... uRls) {
+
+
+
+            APICall();
+            APICall2();
+
+            return null;
+        }
+
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            super.onPostExecute(result);
+            // Dismiss the progress dialog
+            //pDialog.setVisibility(View.INVISIBLE);
+            //   prog.setVisibility(View.GONE);
+
+
+            //   prog.setVisibility(View.GONE);
+            pDialog.dismiss();
+
+
+
+
+
+        }
+
+    }*/
 
     @Override
     public void onBackPressed()
     {
     }
 
-    public void APICall() {
+/*    public void APICall() {
 
         URL="http://paperfly.mybdweb.com/marchant_info.php";
 
@@ -309,10 +340,10 @@ ImageView settings;
                                String l_s_splus_order_count= jsonObject.getString("l_s_splus_order_count");
                                String express_order_count= jsonObject.getString("express_order_count");
 
-                               /* ModelPickUpSummary m=new ModelPickUpSummary();
+                               *//* ModelPickUpSummary m=new ModelPickUpSummary();
                                 m.setTotal_order_count(total_order_count);
                                 m.setL_s_splus_order_count(l_s_splus_order_count);
-                                m.setExpress_order_count(express_order_count);*/
+                                m.setExpress_order_count(express_order_count);*//*
 
 
                                // System.out.println("marchantListPhone"+marchantList.get(i).getMarchent_phone1());
@@ -331,11 +362,162 @@ ImageView settings;
 
 
                                 recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-                                mAdapter = new MarchantInfoAdapter(customList,marchantList);
+                                mAdapter = new MarchantInfoAdapter(customList,marchantList,usertype,userid,barcodeApi,barcodeType);
 
-                                recyclerView.addOnItemTouchListener(new RecyclerTouchListener(MarchantInfoActivity.this, recyclerView, new ClickListener() {
+
+
+
+
+                                recyclerView.addOnItemTouchListener(
+                                        new RecyclerItemClickListener(MarchantInfoActivity.this, new RecyclerItemClickListener.OnItemClickListener() {
+                                            @Override public void onItemClick(View view, int position) {
+                                                // TODO Handle item click
+
+
+
+                                                marchant = new ModelMarchantInfo();
+                                                marchant = marchantList.get(position);
+
+
+                                                custom=new CustomModel();
+                                                custom = customList.get(position);
+
+
+
+*//*
+
+                                                //Details
+                                                lnrLayout = (LinearLayout) view.findViewById(R.id.name);
+
+                                                lnrLayout.setOnClickListener(new View.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(View view) {
+                                                        // Intent intent = new Intent(this, DetailLessonActivity.class);
+                                                        //intent.putExtra("id", lesson.getId());
+                                                        //      startActivity(intent);
+
+
+                                                        final Dialog dialog = new Dialog(MarchantInfoActivity.this);
+                                                        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                                                        dialog.setContentView(R.layout.custom_dialog);
+                                                        dialog.setTitle("Marchant Info");
+                                                        dialog.getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
+
+
+                                                        TextView    name = (TextView) dialog.findViewById(R.id.text1);
+                                                        TextView  address = (TextView) dialog.findViewById(R.id.text2);
+                                                        TextView   phone = (TextView) dialog.findViewById(R.id.text3);
+
+                                                        String tempString=marchant.getMarchent_phone1();
+                                                        //TextView text=(TextView)findViewById(R.id.text);
+                                                        SpannableString spanString = new SpannableString(tempString);
+                                                        spanString.setSpan(new UnderlineSpan(), 0, spanString.length(), 0);
+                                                        spanString.setSpan(new StyleSpan(Typeface.BOLD), 0, spanString.length(), 0);
+                                                        spanString.setSpan(new StyleSpan(Typeface.ITALIC), 0, spanString.length(), 0);
+                                                        phone.setText(spanString);
+
+                                                        name.setText(marchant.getMarchent_name());
+                                                        address.setText(marchant.getMarchent_address());
+                                                        phone.setText(marchant.getMarchent_phone1());
+
+
+                                                        phone.setOnClickListener(new View.OnClickListener() {
+                                                            @Override
+                                                            public void onClick(View v) {
+
+
+
+                                                                try {
+
+
+                                                                    Intent callIntent = new Intent(Intent.ACTION_CALL);
+                                                                    //    callIntent.setPackage("com.android.server.telecom");
+
+
+                                                                    callIntent.setData(Uri.parse("tel:" + marchant.getMarchent_phone1()));
+                                                                    // callIntent.setData(Uri.parse(print.getMarchent_phone1()));
+
+                                                                    if (ActivityCompat.checkSelfPermission(MarchantInfoActivity.this,
+                                                                            Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
+
+                                                                        MarchantInfoActivity.this.startActivity(callIntent);
+                                                                        // return;
+                                                                    }
+                                                                    else{
+
+                                                                        //  Toast.makeText(getApplicationContext(), "Permission Required For calling", Toast.LENGTH_SHORT).show();
+
+                                                                    }
+
+
+                                                                } catch (Exception e) {
+                                                                    // no activity to handle intent. show error dialog/toast whatever
+                                                                }
+
+
+
+
+                                                            }
+                                                        });
+
+                                                        ImageView add = (ImageView) dialog.findViewById(R.id.close);
+
+
+
+                                                        add.setOnClickListener(new View.OnClickListener() {
+                                                            @Override
+                                                            public void onClick(View v) {
+
+                                                                dialog.dismiss();
+
+                                                                //    dailyTourPlanlist.addAll(sharedPreferencesData.getSharedPrefDailyTourPlan(Daily_Visit_Plan));
+                                                            }
+                                                        });
+
+
+                                                        dialog.show();
+
+
+                                                    }
+                                                });
+*//*
+
+
+                                                //send to prcatice
+
+
+*//*   LinearLayout send = (LinearLayout) view.findViewById(R.id.next);
+
+                                                send.setOnClickListener(new View.OnClickListener() {
+                                                    @Override
+                                                    public void onClick(View view) {
+
+                                                        Intent intent = new Intent(MarchantInfoActivity.this, ConcernedMarchantPickupActivity.class);
+                                                        intent.putExtra("id",custom.getPickupId());
+                                                        intent.putExtra("name",custom.getMarchent_name());
+                                                        intent.putExtra("usertype",usertype);
+                                                        intent.putExtra("userid",userid);
+                                                        intent.putExtra("barcodeApi",barcodeApi);
+                                                        intent.putExtra("barcodeType",barcodeType);
+
+
+                                                        //  print.getMarchent_id();
+                                                        startActivity(intent);
+
+
+                                                    }
+                                                });*//*
+                                            }
+                                        })
+                                );
+
+                                //////////////////////////
+
+                           *//*
+
+                                recyclerView.addOnItemTouchListener(new RecyclerTouchListener(MarchantInfoActivity.this,new RecyclerItemClickListener.OnItemClickListener() { {
                                     @Override
-                                    public void onClick(View view, int position) {
+                                    public void onItemClick(View view, int position) {
 
 
 
@@ -408,7 +590,7 @@ ImageView settings;
                                                             }
                                                             else{
 
-                                                                Toast.makeText(getApplicationContext(), "Permission Required For calling", Toast.LENGTH_SHORT).show();
+                                                              //  Toast.makeText(getApplicationContext(), "Permission Required For calling", Toast.LENGTH_SHORT).show();
 
                                                             }
 
@@ -469,61 +651,7 @@ ImageView settings;
                     }
                 });
 
-                                           /*
 
-
-                //share kesson
-
-
-                ImageButton share = (ImageButton) view.findViewById(R.id.share);
-                //  Movie movie = movieList.get(position);
-                share.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-
-
-                        Intent sharingIntent = new Intent(Intent.ACTION_SEND);
-                        sharingIntent.setType("text/html");
-                        sharingIntent.putExtra(Intent.EXTRA_TEXT, lesson.getName() + " " + Html.fromHtml(lesson.getDescription()).toString());
-                        startActivity(Intent.createChooser(sharingIntent, "Share using"));
-
-                        //Toast.makeText(getApplicationContext(), "share" + " is selected!", Toast.LENGTH_SHORT).show();
-
-                    }
-                });
-
-
-
-
-                //copy lesson
-
-
-                ImageButton copy = (ImageButton) view.findViewById(R.id.copy);
-                //  Movie movie = movieList.get(position);
-                copy.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-
-                        int sdk = android.os.Build.VERSION.SDK_INT;
-                        if (sdk < android.os.Build.VERSION_CODES.HONEYCOMB) {
-                            android.text.ClipboardManager clipboard = (android.text.ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
-                            clipboard.setText(lesson.getName() + " " + lesson.getDescription());
-                        } else {
-                            android.content.ClipboardManager clipboard = (android.content.ClipboardManager) getActivity().getSystemService(Context.CLIPBOARD_SERVICE);
-                            android.content.ClipData clip = android.content.ClipData.newPlainText("text label", lesson.getName() + " " + Html.fromHtml(Html.fromHtml(lesson.getDescription()).toString()));
-                            clipboard.setPrimaryClip(clip);
-                        }
-
-                        Snackbar snackbar = Snackbar
-                                .make(coordinatorLayout, "Lesson copied for pasting", Snackbar.LENGTH_LONG);
-
-                        snackbar.show();
-
-                        //  Toast.makeText(getApplicationContext(), "copy" + " is selected!", Toast.LENGTH_SHORT).show();
-
-                    }
-                });
-*/
 
                                     }
 
@@ -532,7 +660,7 @@ ImageView settings;
 
                                     }
                                 }));
-
+*//*
 
                                 RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
                                 recyclerView.setLayoutManager(mLayoutManager);
@@ -564,10 +692,10 @@ ImageView settings;
 // Adding request to request queue
         RequestQueue requestQueue = Volley.newRequestQueue(MarchantInfoActivity.this);
         requestQueue.add(request);
-    }
+    }*/
 
 
-    public void urlCall(){
+   /* public void urlCall(){
 
 
         URL="http://paperfly.mybdweb.com/get_settings.php";
@@ -616,56 +744,41 @@ ImageView settings;
         RequestQueue requestQueue = Volley.newRequestQueue(MarchantInfoActivity.this);
         requestQueue.add(jsonObjReq);
 
-    }
+    }*/
 
 
-    @Override
-    public void onClick(View view, int position) {
-
-        Toast.makeText(MarchantInfoActivity.this, m.getMarchent_name()+m.getMarchent_phone1(), Toast.LENGTH_SHORT).show();
-
-        System.out.println("DDD***"+m.getMarchent_address());
-
-        Toast.makeText(MarchantInfoActivity.this, "Unable to fetch data: ", Toast.LENGTH_SHORT).show();
-
-    }
 
 
-    public static class RecyclerTouchListener implements RecyclerView.OnItemTouchListener {
+    public static class RecyclerItemClickListener implements RecyclerView.OnItemTouchListener {
+        private OnItemClickListener mListener;
 
-        private GestureDetector gestureDetector;
-        private ClickListener clickListener;
+        public interface OnItemClickListener {
+            public void onItemClick(View view, int position);
+        }
 
-        public RecyclerTouchListener(Context context, final RecyclerView recyclerView, ClickListener clickListener1) {
-            clickListener = clickListener1;
-            gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
+        GestureDetector mGestureDetector;
+
+        public RecyclerItemClickListener(Context context, OnItemClickListener listener) {
+            mListener = listener;
+            mGestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
                 @Override
                 public boolean onSingleTapUp(MotionEvent e) {
                     return true;
-                }
-
-                @Override
-                public void onLongPress(MotionEvent e) {
-                    View child = recyclerView.findChildViewUnder(e.getX(), e.getY());
-                    if (child != null && clickListener != null) {
-                        clickListener.onLongClick(child, recyclerView.getChildPosition(child));
-                    }
                 }
             });
         }
 
         @Override
-        public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
-
-            View child = rv.findChildViewUnder(e.getX(), e.getY());
-            if (child != null && clickListener != null && gestureDetector.onTouchEvent(e)) {
-                clickListener.onClick(child, rv.getChildPosition(child));
+        public boolean onInterceptTouchEvent(RecyclerView view, MotionEvent e) {
+            View childView = view.findChildViewUnder(e.getX(), e.getY());
+            if (childView != null && mListener != null && mGestureDetector.onTouchEvent(e)) {
+                mListener.onItemClick(childView, view.getChildAdapterPosition(childView));
             }
             return false;
         }
 
         @Override
-        public void onTouchEvent(RecyclerView rv, MotionEvent e) {
+        public void onTouchEvent(RecyclerView view, MotionEvent motionEvent) {
         }
 
         @Override
@@ -674,11 +787,75 @@ ImageView settings;
         }
     }
 
-    public interface ClickListener {
-        void onClick(View view, int position);
+    private OnItemClickListener mListener;
 
-        void onLongClick(View view, int position);
+    public interface OnItemClickListener {
+        public void onItemClick(View view, int position);
     }
+
+    GestureDetector mGestureDetector;
+
+
+    private class PostTask extends AsyncTask<String[], String, String> {
+
+        public PostTask() {
+        }
+
+        //
+        @Override
+        protected String doInBackground(String[]... data) {
+            // Create a new HttpClient and Post Header
+            HttpClient httpclient = new DefaultHttpClient();
+            HttpPost httppost = new HttpPost("http://paperfly.com.bd/merchantAPI.php");
+
+            try {
+
+                //add data
+                List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+                nameValuePairs.add(new BasicNameValuePair("username", username));
+                nameValuePairs.add(new BasicNameValuePair("pass", password));
+
+                httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+                //execute http post
+                HttpResponse response = httpclient.execute(httppost);
+
+                HttpEntity httpEntity = response.getEntity();
+                String mJson = EntityUtils.toString(httpEntity);
+
+                Log.e("MarchantResponse", mJson.toString());
+
+                JSONArray jsonarray = new JSONArray(mJson);
+
+
+             /*   for (int i = 0; i < jsonarray.length(); i++) {
+                    JSONObject obj = jsonarray.getJSONObject(i);
+
+                    String name = obj.getString("usrname");
+                    String type = obj.getString("type");
+                    String empName = obj.getString("empName");
+
+
+                    Intent intent=new Intent();
+                    intent.putExtra("usrname",name);
+                    intent.putExtra("type",type);
+                    intent.putExtra("empName",empName);
+                    startActivity(intent);
+
+                }*/
+
+
+            } catch (ClientProtocolException e) {
+                Log.e("Response", e.toString());
+            } catch (IOException e) {
+                Log.e("Response", e.toString());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return "";
+        }
+    }
+
+
 }
 
 

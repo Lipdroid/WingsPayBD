@@ -32,7 +32,6 @@ public class StartActivity extends AppCompatActivity {
         myImageView.startAnimation(myFadeInAnimation); //Set animation to your ImageView
 
 
-
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
