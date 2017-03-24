@@ -917,7 +917,7 @@ public class BarcodeActivity extends AppCompatActivity {
 
 
             Bitmap bitmap = Bitmap.createScaledBitmap(targetImage, 200, 140, true);
-            print_image(bitmap);
+           // print_image(bitmap);
 
             byte[] bytes2 = PrintTools_58mm.decodeBitmap(bitmap);
 
