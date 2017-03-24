@@ -1,6 +1,8 @@
 package com.example.com.wingsbangladesh.Activity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -22,6 +24,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.com.wingsbangladesh.R;
+import com.example.com.wingsbangladesh.util.ConstantURLs;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -39,15 +42,16 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class SettingActivity extends AppCompatActivity {
 
-    String usernameText,passwordText,message,result;
-    EditText loginApi,marchantApi,barcodeApi;
-    String logins,marchant,barcode,barcodeType;
-    String code,userid;
+    String usernameText, passwordText, message, result;
+    EditText loginApi, marchantApi, barcodeApi;
+    String logins, marchant, barcode, barcodeType;
+    String code, userid;
     String URL;
     Button update;
     Spinner s;
     int success;
-
+    SharedPreferences prefs;
+    ArrayAdapter<String> adapter_state;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,11 +63,14 @@ public class SettingActivity extends AppCompatActivity {
 
         getSupportActionBar().hide();
 
-        loginApi=(EditText)findViewById(R.id.login_api);
-        marchantApi=(EditText)findViewById(R.id.marchant_api);
-        barcodeApi=(EditText)findViewById(R.id.barcode_api);
+        prefs = getSharedPreferences(ConstantURLs.PREF_NAME, Context.MODE_PRIVATE);
 
-        update=(Button) findViewById(R.id.update);
+
+        loginApi = (EditText) findViewById(R.id.login_api);
+        marchantApi = (EditText) findViewById(R.id.marchant_api);
+        barcodeApi = (EditText) findViewById(R.id.barcode_api);
+
+        update = (Button) findViewById(R.id.update);
 
         update.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -72,25 +79,68 @@ public class SettingActivity extends AppCompatActivity {
             }
         });
 
-        Intent intent=getIntent();
+        Intent intent = getIntent();
         userid = intent.getStringExtra("userid");
 
 
-        String[] state = { "UPC-A", "ITF", "CODE 128" };
+        String[] state = {"UPC-A", "ITF", "CODE 128"};
 
-        s = (Spinner)findViewById(R.id.spinner);
+        s = (Spinner) findViewById(R.id.spinner);
 
-        ArrayAdapter<String> adapter_state = new ArrayAdapter<String>(this,
+        adapter_state = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_item, state);
         adapter_state
                 .setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         s.setAdapter(adapter_state);
 
-        new GetData().execute();
+        //no need for api call now
+        // new GetData().execute();
+
+        showInfo();
+
+        update.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String loginApi_txt = loginApi.getText().toString();
+                String marchantApi_txt = marchantApi.getText().toString();
+                String barcodeApi_txt = barcodeApi.getText().toString();
+                String barcode_type_txt = s.getSelectedItem().toString();
+
+                SharedPreferences.Editor editor = prefs.edit();
+
+                editor.putString(ConstantURLs.LOGIN_API_KEY, loginApi_txt);
+                editor.putString(ConstantURLs.MERCHANT_API_KEY, marchantApi_txt);
+                editor.putString(ConstantURLs.BARCODE_LIST_API_KEY, barcodeApi_txt);
+                editor.putString(ConstantURLs.BARCODE_TYPE_KEY, barcode_type_txt);
+
+                editor.commit();
+                Toast.makeText(SettingActivity.this, "Updated", Toast.LENGTH_LONG).show();
+            }
+        });
 
     }
 
-    private  class GetData extends AsyncTask<Void, Void, Boolean> {
+    /*
+    * Show the shared preference values in the edittexts
+    * if no values set in the prefence it will show the constant value
+    * other wise shows the values in the prefence
+    * */
+    private void showInfo() {
+        String loginApi_txt = prefs.getString(ConstantURLs.LOGIN_API_KEY, ConstantURLs.LOGIN_URL);
+        String marchantApi_txt = prefs.getString(ConstantURLs.MERCHANT_API_KEY, ConstantURLs.MERCHANT_INFO_URL);
+        String barcodeApi_txt = prefs.getString(ConstantURLs.BARCODE_LIST_API_KEY, ConstantURLs.BARCODE_LIST_URL);
+        String barcode_type_txt = prefs.getString(ConstantURLs.BARCODE_TYPE_KEY, "UPC-A");
+
+        int selectionPosition = adapter_state.getPosition(barcode_type_txt);
+        s.setSelection(selectionPosition);
+
+        loginApi.setText(loginApi_txt);
+        marchantApi.setText(marchantApi_txt);
+        barcodeApi.setText(barcodeApi_txt);
+
+    }
+
+    private class GetData extends AsyncTask<Void, Void, Boolean> {
         SweetAlertDialog pDialog;
 
         @Override
@@ -126,10 +176,10 @@ public class SettingActivity extends AppCompatActivity {
     }
 
 
-    public void restcall(){
+    public void restcall() {
 
 
-        URL="http://paperfly.mybdweb.com/get_settings.php";
+        URL = "http://paperfly.mybdweb.com/get_settings.php";
 
 
         JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.GET,
@@ -141,14 +191,13 @@ public class SettingActivity extends AppCompatActivity {
 
 
                         try {
-                            int success=  response.getInt("success");
-                            String message=  response.getString("message");
-                            JSONArray arr=  response.getJSONArray("results");
+                            int success = response.getInt("success");
+                            String message = response.getString("message");
+                            JSONArray arr = response.getJSONArray("results");
 
-                            for(int i=0;i<arr.length();i++) {
+                            for (int i = 0; i < arr.length(); i++) {
 
-                                JSONObject jsonob=arr.getJSONObject(i);
-
+                                JSONObject jsonob = arr.getJSONObject(i);
 
 
                                 logins = jsonob.getString("login_api");
@@ -156,23 +205,20 @@ public class SettingActivity extends AppCompatActivity {
                                 barcode = jsonob.getString("barcode_api");
                                 barcodeType = jsonob.getString("barcode_type");
 
-                                System.out.println("SAAD::"+logins);
+                                System.out.println("SAAD::" + logins);
 
                                 loginApi.setText(logins);
                                 marchantApi.setText(marchant);
                                 barcodeApi.setText(barcode);
 
-                                if(barcodeType=="UPC-A"){
+                                if (barcodeType == "UPC-A") {
                                     s.setSelection(0);
 
 
-                                }
-                                else if(barcodeType=="ITF"){
+                                } else if (barcodeType == "ITF") {
                                     s.setSelection(1);
 
-                                }
-
-                                else if(barcodeType=="CODE 128"){
+                                } else if (barcodeType == "CODE 128") {
 
                                     s.setSelection(2);
                                 }
@@ -230,9 +276,9 @@ public class SettingActivity extends AppCompatActivity {
                         try {
                             success = response.getInt("success");
 
-                               message = response.getString("message");
+                            message = response.getString("message");
 
-                           // result= response.getJSONObject("results");
+                            // result= response.getJSONObject("results");
 
                             //token = response.getString("token");
                         } catch (JSONException e) {
@@ -240,13 +286,12 @@ public class SettingActivity extends AppCompatActivity {
                         }
 
 
-                        if (success==1) {
+                        if (success == 1) {
 
                             Toast.makeText(SettingActivity.this, message,
                                     Toast.LENGTH_LONG).show();
 
-                        }
-                        else if(success==0){
+                        } else if (success == 0) {
 
                             Toast.makeText(SettingActivity.this, message,
                                     Toast.LENGTH_LONG).show();
