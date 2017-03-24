@@ -23,10 +23,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.com.wingsbangladesh.Activity.ConcernedMarchantPickupActivity;
-import com.example.com.wingsbangladesh.Activity.MarchantInfoActivity;
-import com.example.com.wingsbangladesh.Model.CustomModel;
 import com.example.com.wingsbangladesh.Interface.ItemClickListener;
-import com.example.com.wingsbangladesh.Model.ModelMarchantInfo;
+import com.example.com.wingsbangladesh.Model.MarchantModel;
 import com.example.com.wingsbangladesh.R;
 
 import java.util.List;
@@ -38,19 +36,13 @@ import java.util.List;
 
 public class MarchantInfoAdapter extends RecyclerView.Adapter<MarchantInfoAdapter.MyViewHolder> {
 
-    private List<CustomModel> list;
-    private List<ModelMarchantInfo> marchantlist;
+    private List<MarchantModel> list;
     Context context;
     LinearLayout one,two,three,four;
-    ModelMarchantInfo m2;
     private ItemClickListener clickListener;
-    ModelMarchantInfo    marchant;
-    CustomModel  custom;
-
-    String usertype,userid,barcodeApi,barcodeType;
-
-
-
+    MarchantModel m;
+    MarchantModel marchant = new MarchantModel();;
+    String username,password,usertype,marchantcode,employeeName;
 
 
 
@@ -85,14 +77,14 @@ public class MarchantInfoAdapter extends RecyclerView.Adapter<MarchantInfoAdapte
     }
 
 
-    public MarchantInfoAdapter(List<CustomModel> List,List<ModelMarchantInfo> marchantlist,String usertype,String userid,String barcodeApi,String barcodeType) {
+    public MarchantInfoAdapter(List<MarchantModel> List,String username,String password,String usertype,String marchantcode,String employeeName) {
         this.list = List;
-        this.marchantlist = marchantlist;
-
+        this.username = username;
+        this.password = password;
         this.usertype = usertype;
-        this.userid = userid;
-        this.barcodeApi = barcodeApi;
-        this.barcodeType = barcodeType;
+        this.marchantcode=marchantcode;
+        this.employeeName=employeeName;
+
 
     }
 
@@ -107,14 +99,11 @@ public class MarchantInfoAdapter extends RecyclerView.Adapter<MarchantInfoAdapte
     }
 
     @Override
-    public void onBindViewHolder(MyViewHolder holder, int position) {
+    public void onBindViewHolder(MyViewHolder holder, final int position) {
 
 
-            marchant = new ModelMarchantInfo();
-        marchant = marchantlist.get(position);
 
-          custom=new CustomModel();
-        custom = list.get(position);
+
 
         if((position%2)==0)
         {
@@ -135,14 +124,14 @@ public class MarchantInfoAdapter extends RecyclerView.Adapter<MarchantInfoAdapte
 
         }
 
-        CustomModel m = list.get(position);
 
-         m2 = marchantlist.get(position);
 
-        holder.textView1.setText(m.getMarchent_name());
-        holder.textView2.setText(m.getTotal_order_count());
-        holder.textView3.setText(m.getLs_order_count());
-        holder.textView4.setText(m.getExpress_order_cont());
+        marchant = list.get(position);
+
+        holder.textView1.setText(marchant.getMerchantName());
+        holder.textView2.setText(marchant.getTotorder());
+        holder.textView3.setText(marchant.getLarge());
+        holder.textView4.setText(marchant.getExpress());
 
 //dial call
         holder.lnrLayout.setOnClickListener(new View.OnClickListener() {
@@ -153,6 +142,9 @@ public class MarchantInfoAdapter extends RecyclerView.Adapter<MarchantInfoAdapte
                 //      startActivity(intent);
 
 
+                m=new MarchantModel();
+
+                m=list.get(position);
 
 
                 final Dialog dialog = new Dialog(context);
@@ -166,7 +158,7 @@ public class MarchantInfoAdapter extends RecyclerView.Adapter<MarchantInfoAdapte
                 TextView  address = (TextView) dialog.findViewById(R.id.text2);
                 TextView   phone = (TextView) dialog.findViewById(R.id.text3);
 
-                String tempString=marchant.getMarchent_phone1();
+                String tempString=m.getCompanyPhone();
                 //TextView text=(TextView)findViewById(R.id.text);
                 SpannableString spanString = new SpannableString(tempString);
                 spanString.setSpan(new UnderlineSpan(), 0, spanString.length(), 0);
@@ -174,9 +166,9 @@ public class MarchantInfoAdapter extends RecyclerView.Adapter<MarchantInfoAdapte
                 spanString.setSpan(new StyleSpan(Typeface.ITALIC), 0, spanString.length(), 0);
                 phone.setText(spanString);
 
-                name.setText(marchant.getMarchent_name());
-                address.setText(marchant.getMarchent_address());
-                phone.setText(marchant.getMarchent_phone1());
+                name.setText(m.getMerchantName());
+                address.setText(m.getAddress());
+                phone.setText(m.getCompanyPhone());
 
 
                 phone.setOnClickListener(new View.OnClickListener() {
@@ -192,7 +184,7 @@ public class MarchantInfoAdapter extends RecyclerView.Adapter<MarchantInfoAdapte
                             //    callIntent.setPackage("com.android.server.telecom");
 
 
-                            callIntent.setData(Uri.parse("tel:" + marchant.getMarchent_phone1()));
+                            callIntent.setData(Uri.parse("tel:" + m.getCompanyPhone()));
                             // callIntent.setData(Uri.parse(print.getMarchent_phone1()));
 
                             if (ActivityCompat.checkSelfPermission(context,
@@ -246,15 +238,13 @@ public class MarchantInfoAdapter extends RecyclerView.Adapter<MarchantInfoAdapte
             public void onClick(View v) {
 
                 Intent intent = new Intent(context, ConcernedMarchantPickupActivity.class);
-                intent.putExtra("id",custom.getPickupId());
-                intent.putExtra("name",custom.getMarchent_name());
+
+                intent.putExtra("username",username);
+                intent.putExtra("password",password);
                 intent.putExtra("usertype",usertype);
-                intent.putExtra("userid",userid);
-                intent.putExtra("barcodeApi",barcodeApi);
-                intent.putExtra("barcodeType",barcodeType);
+                intent.putExtra("marchantcode",marchantcode);
+                intent.putExtra("employeeName",employeeName);
 
-
-                //  print.getMarchent_id();
                 context.startActivity(intent);
 
             }

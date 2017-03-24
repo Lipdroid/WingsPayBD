@@ -11,11 +11,9 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.example.com.wingsbangladesh.Activity.ConcernedMarchantPickupActivity;
 import com.example.com.wingsbangladesh.Activity.PrintActivity;
 import com.example.com.wingsbangladesh.Interface.ItemClickListener;
-import com.example.com.wingsbangladesh.Model.ModelMarchantInfo;
-import com.example.com.wingsbangladesh.Model.ModelPrint;
+import com.example.com.wingsbangladesh.Model.ModelBarcodeList;
 import com.example.com.wingsbangladesh.R;
 
 import java.util.List;
@@ -27,14 +25,12 @@ import java.util.List;
 
 public class ConcernedPickUpAdapter extends RecyclerView.Adapter<ConcernedPickUpAdapter.MyViewHolder> {
 
-    private List<ModelPrint> marchantlist;
+    private List<ModelBarcodeList> barcodelist;
     Context context;
     LinearLayout one,two,three;
-    ModelMarchantInfo m2;
     private ItemClickListener clickListener;
-    ModelPrint print;
     String barcodeApi,barcodeType;
-    ModelPrint m;
+    ModelBarcodeList m;
 
 
 
@@ -68,11 +64,10 @@ public class ConcernedPickUpAdapter extends RecyclerView.Adapter<ConcernedPickUp
     }
 
 
-    public ConcernedPickUpAdapter(List<ModelPrint> List,String barcodeApi,String barcodeType) {
+    public ConcernedPickUpAdapter(List<ModelBarcodeList> List) {
 
-        this.marchantlist = List;
-        this.barcodeApi = barcodeApi;
-        this.barcodeType = barcodeType;
+        this.barcodelist = List;
+
 
     }
 
@@ -87,7 +82,7 @@ public class ConcernedPickUpAdapter extends RecyclerView.Adapter<ConcernedPickUp
     }
 
     @Override
-    public void onBindViewHolder(MyViewHolder holder, int position) {
+    public void onBindViewHolder(MyViewHolder holder, final int position) {
 
 
 
@@ -109,29 +104,31 @@ public class ConcernedPickUpAdapter extends RecyclerView.Adapter<ConcernedPickUp
 
 
         }
-         m = marchantlist.get(position);
+         m = barcodelist.get(position);
 
-        holder.textView1.setText(m.getPaperFlyOrder());
-        holder.textView2.setText(m.getBarCode());
+        holder.textView1.setText(m.getOrderid());
+        holder.textView2.setText(m.getBarcode());
       //  holder.textView3.setText(m.getMarchentCode());
 
 
-      /*  holder.btn.setOnClickListener(new View.OnClickListener() {
+       holder.btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
+ModelBarcodeList p;
+                p = barcodelist.get(position);
+
                 Intent intent = new Intent(context, PrintActivity.class);
-                intent.putExtra("id", m.getBarcodeId());
-                intent.putExtra("barcode_token", m.getBarCode());
-                intent.putExtra("barcodeApi", barcodeApi);
-                intent.putExtra("barcodeType", barcodeType);
-
-
-                System.out.println("SAAD"+m.getBarcodeId()+"     "+m.getBarCode()+"     "+barcodeApi+"    "+barcodeType);
+                intent.putExtra("orderId", p.getOrderid());
+                intent.putExtra("marchantref", p.getMerOrderRef());
+                intent.putExtra("marchantcode", p.getMerchantCode());
+                intent.putExtra("productprice", p.getPackagePrice());
+                intent.putExtra("phone", p.getPhone());
+                intent.putExtra("barcode", p.getBarcode());
 
                 context.startActivity(intent);
             }
-        });*/
+        });
 
 
     }
@@ -145,7 +142,7 @@ public class ConcernedPickUpAdapter extends RecyclerView.Adapter<ConcernedPickUp
 
     @Override
     public int getItemCount() {
-        return marchantlist.size();
+        return barcodelist.size();
     }
 }
 

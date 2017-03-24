@@ -31,13 +31,7 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
-import com.example.com.wingsbangladesh.Model.ModelBarcode;
+
 import com.example.com.wingsbangladesh.util.P25ConnectionException;
 import com.example.com.wingsbangladesh.util.P25Connector;
 import com.example.com.wingsbangladesh.R;
@@ -51,9 +45,6 @@ import com.onbarcode.barcode.android.Code128;
 import com.onbarcode.barcode.android.IBarcode;
 import com.onbarcode.barcode.android.ITF14;
 import com.onbarcode.barcode.android.UPCA;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -65,8 +56,11 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class PrintActivity extends AppCompatActivity {
 
-    String id,URL,barcode_token,paperfyorderid,marchentref,marchentcode,productprice,customerphone,barcode,barcodeApi,barcodeType;
-    private List<ModelBarcode> barcodeList = new ArrayList<>();
+    String id,URL,paperfyorderid,marchentref,marchentcode,customerphone,barcode,barcodeApi,barcodeType;
+
+
+
+    String orderId,marchantref,marchantcode,productprice,phone;
     TextView paperfy_order_id, marchent_ref, marchent_code, product_price, customer_phone, marchent_code2;
     Bitmap targetImage;
     LinearLayout ln,view;
@@ -90,17 +84,67 @@ public class PrintActivity extends AppCompatActivity {
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_print);
 
-        Intent intent = getIntent();
-        barcode_token = intent.getStringExtra("barcode_token");
-        id = intent.getStringExtra("id");
-        barcodeApi = intent.getStringExtra("barcodeApi");
-        barcodeType= intent.getStringExtra("barcodeType");
-        barcode_imageView = (ImageView) findViewById(R.id.barcode_img);
 
+
+
+        Intent intent = getIntent();
+        orderId = intent.getStringExtra("orderId");
+        marchantref = intent.getStringExtra("marchantref");
+        marchantcode = intent.getStringExtra("marchantcode");
+        productprice= intent.getStringExtra("productprice");
+        phone= intent.getStringExtra("phone");
+        barcode= intent.getStringExtra("barcode");
+
+
+        barcode_imageView = (ImageView) findViewById(R.id.barcode_img);
 
         getSupportActionBar().hide();
         findViewById();
-        restcall();
+
+
+
+        if (barcode.length()==11) {
+
+            //barcode = jsonObject.getString("barcode_upca");
+            generateUPCACode(barcode);
+
+
+        } else if (barcode.length()==14) {
+           // barcode = jsonObject.getString("barcode_code128");
+            generateCode128Code(barcode);
+
+        } else if(barcode.length()==13){
+        //    barcode = jsonObject.getString("barcode_itf");
+            generateITFCode(barcode);
+
+        }
+
+
+        view = (LinearLayout) findViewById(R.id.barcodeid);
+        bmImage = (ImageView) findViewById(R.id.saad);
+        view.setDrawingCacheEnabled(true);
+
+        paperfy_order_id.setText(orderId);
+        marchent_ref.setText(marchantref);
+        marchent_code.setText(marchantcode);
+        marchent_code2.setText(barcode);
+        product_price.setText(productprice);
+        customer_phone.setText(phone);
+
+
+        view.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+
+        view.layout(0, 0, view.getMeasuredWidth(), view.getMeasuredHeight());
+        view.buildDrawingCache(true);
+        targetImage = Bitmap.createBitmap(view.getDrawingCache());
+        view.setDrawingCacheEnabled(false); // clear drawing cache
+        bmImage.setImageBitmap(targetImage);
+        view.setVisibility(View.GONE);
+
+
+
+
         connectToBluetooth();
 
 
@@ -112,125 +156,6 @@ public class PrintActivity extends AppCompatActivity {
 
         super.onBackPressed();
         finish();
-    }
-
-    public void restcall() {
-
-
-        URL = barcodeApi + id;
-
-
-        JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.GET, URL, null,
-                new Response.Listener<JSONObject>() {
-
-                    @Override
-                    public void onResponse(JSONObject response) {
-
-
-                        try {
-                            int success = response.getInt("success");
-                            String message = response.getString("message");
-
-
-                            if(success==1){
-
-                            JSONArray jsonArray = response.getJSONArray("results");
-                            for (int i = 0; i < jsonArray.length(); i++) {
-                                try {
-
-
-                                    JSONObject jsonObject = jsonArray.getJSONObject(i);
-
-                                    if (barcodeType.equals("UPC-A Code")) {
-
-                                        barcode = jsonObject.getString("barcode_upca");
-                                        generateUPCACode(barcode);
-
-
-                                    } else if (barcodeType.equals("CODE 128")) {
-                                        barcode = jsonObject.getString("barcode_code128");
-                                        generateCode128Code(barcode);
-
-                                    } else {
-                                        barcode = jsonObject.getString("barcode_itf");
-                                        generateITFCode(barcode);
-
-
-                                    }
-
-
-                                    paperfyorderid = jsonObject.getString("paperfy_order_id");
-                                    marchentref = jsonObject.getString("marchent_ref");
-                                    marchentcode = jsonObject.getString("marchent_code");
-                                    productprice = jsonObject.getString("product_price");
-                                    customerphone = jsonObject.getString("customer_phone");
-
-
-                                    //TextView paperfy_order_id,marchent_ref,marchent_code,product_price,customer_phone,marchent_code2;
-
-                                    view = (LinearLayout) findViewById(R.id.barcodeid);
-                                    bmImage = (ImageView) findViewById(R.id.saad);
-
-                                    view.setDrawingCacheEnabled(true);
-                                    // this is the important code :)
-                                    // Without it the view will have a dimension of 0,0 and the bitmap will be null
-
-                                    paperfy_order_id.setText(paperfyorderid);
-                                    marchent_ref.setText(marchentref);
-                                    marchent_code.setText(marchentcode);
-                                    marchent_code2.setText(barcode);
-                                    product_price.setText(productprice);
-                                    customer_phone.setText(customerphone);
-
-                                    view.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
-                                            View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
-
-                                    view.layout(0, 0, view.getMeasuredWidth(), view.getMeasuredHeight());
-
-                                    view.buildDrawingCache(true);
-
-                                    targetImage = Bitmap.createBitmap(view.getDrawingCache());
-
-                                    view.setDrawingCacheEnabled(false); // clear drawing cache
-
-                                    bmImage.setImageBitmap(targetImage);
-
-                                    view.setVisibility(View.GONE);
-
-
-                                } catch (JSONException e) {
-                                    // mEntries.add("Error: " + e.getLocalizedMessage());
-                                }
-                            }
-
-
-                        }
-
-                            else if(success==0){
-
-                                Toast.makeText(PrintActivity.this, message,
-                                        Toast.LENGTH_LONG).show();
-                                ln.setVisibility(View.GONE);
-
-                            }
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-
-                    }
-                }, new Response.ErrorListener() {
-
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-            }
-        });
-
-// Adding request to request queue
-        RequestQueue requestQueue = Volley.newRequestQueue(PrintActivity.this);
-        requestQueue.add(jsonObjReq);
-
     }
 
     public void findViewById() {

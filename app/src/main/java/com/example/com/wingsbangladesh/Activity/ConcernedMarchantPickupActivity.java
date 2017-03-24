@@ -1,15 +1,12 @@
 package com.example.com.wingsbangladesh.Activity;
 
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.GestureDetector;
-import android.view.MotionEvent;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -17,43 +14,41 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
 import com.example.com.wingsbangladesh.Adapter.ConcernedPickUpAdapter;
-import com.example.com.wingsbangladesh.Model.CustomModel;
-import com.example.com.wingsbangladesh.Interface.ItemClickListener;
-import com.example.com.wingsbangladesh.Model.ModelPrint;
+import com.example.com.wingsbangladesh.Model.ModelBarcodeList;
 import com.example.com.wingsbangladesh.R;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.pedant.SweetAlert.SweetAlertDialog;
 
+public class ConcernedMarchantPickupActivity extends AppCompatActivity  {
 
-public class ConcernedMarchantPickupActivity extends AppCompatActivity implements ItemClickListener {
-
-    String URL, name, id;
-    ModelPrint print;
-    private List<ModelPrint> modelPrintList = new ArrayList<>();
-    // private List<ModelPickUpSummary> modellIst = new ArrayList<>();
+    private List<ModelBarcodeList> modelBarcodeList = new ArrayList<>();
     TextView user;
-    CustomModel custom;
     private RecyclerView recyclerView;
     private ConcernedPickUpAdapter mAdapter;
     LinearLayout lnrLayout;
     Button logout;
     ImageView settings;
-    String usertype, userid, barcodeApi, barcodeType;
+    String usertype, userid, marchantcode,username,password,employeeName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,16 +58,18 @@ public class ConcernedMarchantPickupActivity extends AppCompatActivity implement
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.concerned_marchant_pickup_list);
 
-        Intent intent = getIntent();
-        id = intent.getStringExtra("id");
-        name = intent.getStringExtra("name");
+        Intent intent=getIntent();
+
+        username = intent.getStringExtra("username");
+        password = intent.getStringExtra("password");
         usertype = intent.getStringExtra("usertype");
-        userid = intent.getStringExtra("userid");
-        barcodeApi = intent.getStringExtra("barcodeApi");
-        barcodeType = intent.getStringExtra("barcodeType");
+        marchantcode=intent.getStringExtra("marchantcode");
+        employeeName=intent.getStringExtra("employeeName");
 
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+        recyclerView.setLayoutManager(mLayoutManager);
         user = (TextView) findViewById(R.id.username);
 
 
@@ -80,7 +77,7 @@ public class ConcernedMarchantPickupActivity extends AppCompatActivity implement
         settings = (ImageView) findViewById(R.id.setting);
 
 
-        if (usertype.equals("1")) {
+        if (usertype.equals("Employee")) {
 
             settings.setVisibility(View.GONE);
         }
@@ -108,9 +105,9 @@ public class ConcernedMarchantPickupActivity extends AppCompatActivity implement
         getSupportActionBar().hide();
 
 
-        user.setText(name);
+        user.setText(employeeName);
 
-        new GetData().execute();
+        new PostTask().execute();
 
 
 
@@ -122,252 +119,105 @@ public class ConcernedMarchantPickupActivity extends AppCompatActivity implement
     }
 
 
-    public void restcall() {
+    private class PostTask extends AsyncTask<String[], String, String> {
 
+        public PostTask() {
+        }
 
-        URL = barcodeApi;
+        //
+        @Override
+        protected String doInBackground(String[]... data) {
+            // Create a new HttpClient and Post Header
+            HttpClient httpclient = new DefaultHttpClient();
+            HttpPost httppost = new HttpPost("http://paperfly.com.bd/barcodeList.php");
 
+            try {
 
-        JsonObjectRequest jsonObjReq = new JsonObjectRequest(Request.Method.GET,
-                URL, null,
-                new Response.Listener<JSONObject>() {
+                //add data
+                List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+                nameValuePairs.add(new BasicNameValuePair("username", username));
+                nameValuePairs.add(new BasicNameValuePair("pass", password));
+                nameValuePairs.add(new BasicNameValuePair("merchantCode", marchantcode));
 
-                    @Override
-                    public void onResponse(JSONObject response) {
 
+                httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+                //execute http post
+                HttpResponse response = httpclient.execute(httppost);
 
-                        try {
-                            int success = response.getInt("success");
-                            String message = response.getString("message");
+                HttpEntity httpEntity = response.getEntity();
+                String mJson = EntityUtils.toString(httpEntity);
 
-                            JSONArray jsonArray = response.getJSONArray("results");
-                            for (int i = 0; i < jsonArray.length(); i++) {
-                                try {
-                                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                Log.e("saadResponse", mJson.toString());
 
-                                    String barcode;
-                                    // mEntries.add(jsonObject.toString());
+                if(mJson.toString().length()==0){
 
-                                    if (barcodeType.equals("UPC-A Code")) {
+                    Toast.makeText(ConcernedMarchantPickupActivity.this, "Login Failed,Please try Again!",
+                            Toast.LENGTH_LONG).show();
 
-                                        barcode = jsonObject.getString("barcode_upca");
-
-
-                                    } else if (barcodeType.equals("CODE 128")) {
-                                        barcode = jsonObject.getString("barcode_code128");
-
-                                    } else {
-                                        barcode = jsonObject.getString("barcode_itf");
-
-
-                                    }
-
-
-                                    String barcode_id = jsonObject.getString("barcode_id");
-                                    String paperfy_order_id = jsonObject.getString("paperfy_order_id");
-
-                                    String marchent_code = jsonObject.getString("marchent_code");
-
-                                    System.out.println("marchent_code::" + marchent_code);
-
-                                    ModelPrint m = new ModelPrint();
-                                    m.setBarcodeId(barcode_id);
-                                    m.setPaperFlyOrder(paperfy_order_id);
-                                    m.setBarCode(barcode);
-                                    m.setMarchentCode(marchent_code);
-
-
-                                    System.out.println("barcode::" + barcode);
-
-                                    modelPrintList.add(m);
-
-                                    System.out.println("modelPrintList::" + modelPrintList);
-
-
-
-
-
-
-                                    recyclerView.addOnItemTouchListener(new ConcernedMarchantPickupActivity.RecyclerTouchListener(ConcernedMarchantPickupActivity.this, recyclerView, new ConcernedMarchantPickupActivity.ClickListener() {
-                                        @Override
-                                        public void onClick(View view, int position) {
-
-
-                                            print = new ModelPrint();
-                                            print = modelPrintList.get(position);
-
-
-
-
-                                            Intent intent = new Intent(ConcernedMarchantPickupActivity.this, PrintActivity.class);
-                                            intent.putExtra("id", print.getBarcodeId());
-                                            intent.putExtra("barcode_token", print.getBarCode());
-                                            intent.putExtra("barcodeApi", barcodeApi);
-                                            intent.putExtra("barcodeType", barcodeType);
-
-                                            startActivity(intent);
-
-
-            /*    //Details
-                Button btn = (Button) view.findViewById(R.id.button);
-
-                btn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-
-
-
-
-                        Intent intent = new Intent(ConcernedMarchantPickupActivity.this, PrintActivity.class);
-                        intent.putExtra("id", print.getBarcodeId());
-                        intent.putExtra("barcode_token", print.getBarCode());
-                        intent.putExtra("barcodeApi", barcodeApi);
-                        intent.putExtra("barcodeType", barcodeType);
-
-                        startActivity(intent);
-
-
-                    }
-                });*/
-                                        }
-
-                                        @Override
-                                        public void onLongClick(View view, int position) {
-
-                                        }
-                                    }));
-
-
-
-
-
-
-                                    mAdapter = new ConcernedPickUpAdapter(modelPrintList,barcodeApi,barcodeType);
-                                    RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
-                                    recyclerView.setLayoutManager(mLayoutManager);
-                                    recyclerView.setAdapter(mAdapter);
-
-
-
-
-                                } catch (JSONException e) {
-                                    // mEntries.add("Error: " + e.getLocalizedMessage());
-                                }
-                            }
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-
-                    }
-                }, new Response.ErrorListener() {
-
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-            }
-        });
-
-// Adding request to request queue
-        RequestQueue requestQueue = Volley.newRequestQueue(ConcernedMarchantPickupActivity.this);
-        requestQueue.add(jsonObjReq);
-
-    }
-
-    @Override
-    public void onClick(View view, int position) {
-
-    }
-
-
-    public static class RecyclerTouchListener implements RecyclerView.OnItemTouchListener {
-
-        private GestureDetector gestureDetector;
-        private ClickListener clickListener;
-
-        public RecyclerTouchListener(Context context, final RecyclerView recyclerView, ClickListener clickListener1) {
-            clickListener = clickListener1;
-            gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
-                @Override
-                public boolean onSingleTapUp(MotionEvent e) {
-                    return true;
                 }
 
-                @Override
-                public void onLongPress(MotionEvent e) {
-                    View child = recyclerView.findChildViewUnder(e.getX(), e.getY());
-                    if (child != null && clickListener != null) {
-                        clickListener.onLongClick(child, recyclerView.getChildPosition(child));
-                    }
+                JSONArray jsonarray = new JSONArray(mJson);
+
+
+                for (int i = 0; i < jsonarray.length(); i++) {
+                    JSONObject obj = jsonarray.getJSONObject(i);
+
+
+
+                    String orderid = obj.getString("orderid");
+                    String barcode = obj.getString("barcode");
+                    String merchantCode = obj.getString("merchantCode");
+                    String merOrderRef = obj.getString("merOrderRef");
+                    String packagePrice = obj.getString("packagePrice");
+                    String phone = obj.getString("phone");
+
+
+
+                    ModelBarcodeList m = new ModelBarcodeList();
+                  //  m.setBarcodeId(barcode_id);
+                    m.setOrderid(orderid);
+                    m.setBarcode(barcode);
+                    m.setMerchantCode(merchantCode);
+                    m.setMerOrderRef(merOrderRef);
+                    m.setPackagePrice(packagePrice);
+                    m.setPhone(phone);
+
+
+                    modelBarcodeList.add(m);
+
+
+
+
+
+
+
+
                 }
-            });
-        }
 
-        @Override
-        public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
 
-            View child = rv.findChildViewUnder(e.getX(), e.getY());
-            if (child != null && clickListener != null && gestureDetector.onTouchEvent(e)) {
-                clickListener.onClick(child, rv.getChildPosition(child));
+            } catch (ClientProtocolException e) {
+                Log.e("Response", e.toString());
+            } catch (IOException e) {
+                Log.e("Response", e.toString());
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
-            return false;
-        }
-
-        @Override
-        public void onTouchEvent(RecyclerView rv, MotionEvent e) {
-        }
-
-        @Override
-        public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
-
-        }
-    }
-
-    public interface ClickListener {
-        void onClick(View view, int position);
-
-        void onLongClick(View view, int position);
-    }
-
-    private class GetData extends AsyncTask<Void, Void, Boolean> {
-        SweetAlertDialog pDialog;
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-
-
-            pDialog = new SweetAlertDialog(ConcernedMarchantPickupActivity.this, SweetAlertDialog.PROGRESS_TYPE);
-            pDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
-            pDialog.setTitleText("Loading");
-            pDialog.setCancelable(false);
-            pDialog.show();
-
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... uRls) {
-
-
-            restcall();
-            return null;
+            return "";
         }
 
 
+
         @Override
-        protected void onPostExecute(Boolean result) {
+        protected void onPostExecute(String result) {
             super.onPostExecute(result);
-            // Dismiss the progress dialog
-            //pDialog.setVisibility(View.INVISIBLE);
-            //   prog.setVisibility(View.GONE);
 
+            mAdapter = new ConcernedPickUpAdapter(modelBarcodeList);
+            Log.e("saadtest",modelBarcodeList.toString());
+            recyclerView.setAdapter(mAdapter);
 
-            //   prog.setVisibility(View.GONE);
-            pDialog.dismiss();
 
 
         }
-
     }
 }
 

@@ -52,10 +52,8 @@ public class LoginActivity extends AppCompatActivity {
 
     String usernameText, passwordText;
     EditText username, password;
-    String code;
-     String URL="http://paperfly.com.bd/la.php";
+    String URL = "http://paperfly.com.bd/la.php";
     Button login;
-    String loginApi, marchantApi, barcodeApi, barcodeType;
 
 
     @Override
@@ -72,7 +70,6 @@ public class LoginActivity extends AppCompatActivity {
         username = (EditText) findViewById(R.id.username);
         password = (EditText) findViewById(R.id.password);
         login = (Button) findViewById(R.id.login);
-
 
 
         login.setOnClickListener(new View.OnClickListener() {
@@ -106,7 +103,7 @@ public class LoginActivity extends AppCompatActivity {
         protected String doInBackground(String[]... data) {
             // Create a new HttpClient and Post Header
             HttpClient httpclient = new DefaultHttpClient();
-            HttpPost httppost = new HttpPost("http://paperfly.com.bd/la.php");
+            HttpPost httppost = new HttpPost(URL);
 
             try {
                 //add data
@@ -115,13 +112,22 @@ public class LoginActivity extends AppCompatActivity {
                 nameValuePairs.add(new BasicNameValuePair("pass", passwordText));
 
                 httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+
                 //execute http post
                 HttpResponse response = httpclient.execute(httppost);
-
                 HttpEntity httpEntity = response.getEntity();
                 String mJson = EntityUtils.toString(httpEntity);
 
                 Log.e("Response", mJson.toString());
+
+
+                if (mJson.toString().length() == 0) {
+
+                    Toast.makeText(LoginActivity.this, "Login Failed,Please try Again!",
+                            Toast.LENGTH_LONG).show();
+
+
+                }
 
                 JSONArray jsonarray = new JSONArray(mJson);
 
@@ -134,11 +140,11 @@ public class LoginActivity extends AppCompatActivity {
                     String empName = obj.getString("empName");
 
 
-                    Intent intent=new Intent(LoginActivity.this,MarchantInfoActivity.class);
-                    intent.putExtra("usrname",name);
-                    intent.putExtra("pass",passwordText);
-                    intent.putExtra("type",type);
-                    intent.putExtra("empName",empName);
+                    Intent intent = new Intent(LoginActivity.this, MarchantInfoActivity.class);
+                    intent.putExtra("usrname", name);
+                    intent.putExtra("pass", passwordText);
+                    intent.putExtra("type", type);
+                    intent.putExtra("empName", empName);
                     startActivity(intent);
 
                 }
