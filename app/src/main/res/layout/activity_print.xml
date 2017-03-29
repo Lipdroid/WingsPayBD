@@ -144,8 +144,8 @@ android:id="@+id/mother"
 
         <ImageView
             android:id="@+id/barcode_img"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content"
+            android:layout_width="250dp"
+            android:layout_height="100dp"
             android:padding="5dp" />
 
         <TextView
@@ -167,7 +167,7 @@ android:id="@+id/mother"
         android:layout_gravity="center"
 
         />
-
+<!--
     <Button
         android:id="@+id/btn_print_barcode"
         android:gravity="center"
@@ -175,7 +175,7 @@ android:id="@+id/mother"
         android:layout_gravity="center"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Print" />
+        android:text="Print" />-->
 
 </LinearLayout>
 

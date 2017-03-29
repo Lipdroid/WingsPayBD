@@ -19,4 +19,7 @@ public class ConstantURLs {
     public static final String BARCODE_TYPE_KEY = "barcode_type_Key";
 
 
+    public static int FLAG = 0;
+
+
 }

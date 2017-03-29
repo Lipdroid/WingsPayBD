@@ -23,6 +23,7 @@ import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.com.wingsbangladesh.Adapter.MarchantInfoAdapter;
 import com.example.com.wingsbangladesh.R;
 
 import org.apache.http.HttpEntity;
@@ -54,6 +55,7 @@ public class LoginActivity extends AppCompatActivity {
     EditText username, password;
     String URL = "http://paperfly.com.bd/la.php";
     Button login;
+    String mJson;
 
 
     @Override
@@ -116,18 +118,13 @@ public class LoginActivity extends AppCompatActivity {
                 //execute http post
                 HttpResponse response = httpclient.execute(httppost);
                 HttpEntity httpEntity = response.getEntity();
-                String mJson = EntityUtils.toString(httpEntity);
+                 mJson = EntityUtils.toString(httpEntity);
+
+                System.out.println("sss"+response);
 
                 Log.e("Response", mJson.toString());
 
 
-                if (mJson.toString().length() == 0) {
-
-                    Toast.makeText(LoginActivity.this, "Login Failed,Please try Again!",
-                            Toast.LENGTH_LONG).show();
-
-
-                }
 
                 JSONArray jsonarray = new JSONArray(mJson);
 
@@ -151,13 +148,35 @@ public class LoginActivity extends AppCompatActivity {
 
 
             } catch (ClientProtocolException e) {
+
+                Toast.makeText(LoginActivity.this, "Login Failed,Please try Again!",
+                        Toast.LENGTH_LONG).show();
                 Log.e("Response", e.toString());
             } catch (IOException e) {
+                Toast.makeText(LoginActivity.this, "Login Failed,Please try Again!",
+                        Toast.LENGTH_LONG).show();
                 Log.e("Response", e.toString());
             } catch (JSONException e) {
+                Toast.makeText(LoginActivity.this, "Login Failed,Please try Again!",
+                        Toast.LENGTH_LONG).show();
                 e.printStackTrace();
             }
             return "";
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+
+
+            if (mJson .equals("[]") ) {
+
+                Toast.makeText(LoginActivity.this, "Login Failed,Please try Again!",
+                        Toast.LENGTH_LONG).show();
+
+
+            }
+
         }
     }
 

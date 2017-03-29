@@ -32,6 +32,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.com.wingsbangladesh.util.ConstantURLs;
 import com.example.com.wingsbangladesh.util.P25ConnectionException;
 import com.example.com.wingsbangladesh.util.P25Connector;
 import com.example.com.wingsbangladesh.R;
@@ -56,24 +57,21 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class PrintActivity extends AppCompatActivity {
 
-    String id,URL,paperfyorderid,marchentref,marchentcode,customerphone,barcode,barcodeApi,barcodeType;
-
-
-
-    String orderId,marchantref,marchantcode,productprice,phone;
+    String barcode,orderId,marchantref,marchantcode,productprice,phone;
     TextView paperfy_order_id, marchent_ref, marchent_code, product_price, customer_phone, marchent_code2;
     Bitmap targetImage;
     LinearLayout ln,view;
     ImageView barcode_imageView = null;
     ImageView bmImage;
 
-    private Button mConnectBtn,mEnableBtn,mPrintBarcodeBtn;
+    private Button mConnectBtn,mEnableBtn;
     private Spinner mDeviceSp;
     private ProgressDialog mProgressDlg;
     private ProgressDialog mConnectingDlg;
     private BluetoothAdapter mBluetoothAdapter;
     private P25Connector mConnector;
     private ArrayList<BluetoothDevice> mDeviceList = new ArrayList<BluetoothDevice>();
+
 
 
     @Override
@@ -98,7 +96,7 @@ public class PrintActivity extends AppCompatActivity {
 
         barcode_imageView = (ImageView) findViewById(R.id.barcode_img);
 
-        getSupportActionBar().hide();
+       // getSupportActionBar().hide();
         findViewById();
 
 
@@ -109,7 +107,15 @@ public class PrintActivity extends AppCompatActivity {
             generateUPCACode(barcode);
 
 
-        } else if (barcode.length()==14) {
+        }
+
+
+        else{
+
+            Toast.makeText(PrintActivity.this, "No barcode found!",
+                    Toast.LENGTH_LONG).show();
+        }
+        /*else if (barcode.length()==14) {
            // barcode = jsonObject.getString("barcode_code128");
             generateCode128Code(barcode);
 
@@ -117,7 +123,7 @@ public class PrintActivity extends AppCompatActivity {
         //    barcode = jsonObject.getString("barcode_itf");
             generateITFCode(barcode);
 
-        }
+        }*/
 
 
         view = (LinearLayout) findViewById(R.id.barcodeid);
@@ -139,13 +145,47 @@ public class PrintActivity extends AppCompatActivity {
         view.buildDrawingCache(true);
         targetImage = Bitmap.createBitmap(view.getDrawingCache());
         view.setDrawingCacheEnabled(false); // clear drawing cache
-        bmImage.setImageBitmap(targetImage);
+
+
+        //no need to set preview
+      //  bmImage.setImageBitmap(targetImage);
         view.setVisibility(View.GONE);
 
 
 
 
         connectToBluetooth();
+
+
+        if(ConstantURLs.FLAG==1) {
+
+
+            //enable bluetooth
+            mEnableBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+
+                    startActivityForResult(intent, 1000);
+                }
+            });
+
+            //connect/disconnect
+            mConnectBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View arg0) {
+                    connect();
+                    new GetData().execute();
+                }
+            });
+
+        }
+        else{
+
+            showToast("Please Connect to the Bluetooth And Try Again!");
+
+        }
+
 
 
     }
@@ -170,7 +210,7 @@ public class PrintActivity extends AppCompatActivity {
         customer_phone = (TextView) findViewById(R.id.customer_phone);
         mConnectBtn = (Button) findViewById(R.id.btn_connect);
         mEnableBtn = (Button) findViewById(R.id.btn_enable);
-        mPrintBarcodeBtn = (Button) findViewById(R.id.btn_print_barcode);
+     //   mPrintBarcodeBtn = (Button) findViewById(R.id.btn_print_barcode);
         mDeviceSp = (Spinner) findViewById(R.id.sp_device);
         ln=(LinearLayout)findViewById(R.id.mother);
 
@@ -264,7 +304,7 @@ public class PrintActivity extends AppCompatActivity {
         showToast("Bluetooth is unsupported by this device");
 
         mConnectBtn.setEnabled(false);
-        mPrintBarcodeBtn.setEnabled(false);
+     //   mPrintBarcodeBtn.setEnabled(false);
         mDeviceSp.setEnabled(false);
     }
 
@@ -273,9 +313,10 @@ public class PrintActivity extends AppCompatActivity {
 
         mConnectBtn.setText("Disconnect");
 
-        mPrintBarcodeBtn.setEnabled(true);
+       // mPrintBarcodeBtn.setEnabled(true);
 
         mDeviceSp.setEnabled(false);
+
     }
 
     private void showDisonnected() {
@@ -283,9 +324,10 @@ public class PrintActivity extends AppCompatActivity {
 
         mConnectBtn.setText("Connect");
 
-        mPrintBarcodeBtn.setEnabled(false);
+      //  mPrintBarcodeBtn.setEnabled(false);
 
         mDeviceSp.setEnabled(true);
+
     }
 
     private void connect() {
@@ -348,7 +390,7 @@ public class PrintActivity extends AppCompatActivity {
 
 
 
-            Bitmap bitmap = Bitmap.createScaledBitmap(targetImage, 200, 140, true);
+            Bitmap bitmap = Bitmap.createScaledBitmap(targetImage, 300, 210, true);
             byte[] bytes = PrintTools_58mm.decodeBitmap(bitmap);
 
             sendData(bytes);
@@ -437,6 +479,8 @@ public class PrintActivity extends AppCompatActivity {
 
             pDialog.dismiss();
 
+            finish();
+
 
         }
 
@@ -494,53 +538,44 @@ public class PrintActivity extends AppCompatActivity {
                     mConnectingDlg.dismiss();
 
                     showConnected();
+
+                    ConstantURLs.FLAG=1;
+
                 }
 
                 @Override
                 public void onConnectionFailed(String error) {
                     mConnectingDlg.dismiss();
+
+                    ConstantURLs.FLAG=0;
+
                 }
 
                 @Override
                 public void onConnectionCancelled() {
                     mConnectingDlg.dismiss();
+                    ConstantURLs.FLAG=0;
                 }
 
                 @Override
                 public void onDisconnected() {
                     showDisonnected();
+                    ConstantURLs.FLAG=0;
                 }
             });
 
-            //enable bluetooth
-            mEnableBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-
-                    startActivityForResult(intent, 1000);
-                }
-            });
-
-            //connect/disconnect
-            mConnectBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View arg0) {
-                    connect();
-                }
-            });
 
             //print demo text
 
 
             //print barcode 1D or 2D
-            mPrintBarcodeBtn.setOnClickListener(new View.OnClickListener() {
+     /*       mPrintBarcodeBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View arg0) {
                     // printBarcode();
                     new GetData().execute();
                 }
-            });
+            });*/
 
         }
 

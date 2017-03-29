@@ -48,15 +48,11 @@
 
         <activity android:name="com.example.com.wingsbangladesh.Activity.PrintActivity"
             android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.Dialog.Alert"
             >
 
         </activity>
 
-        <activity android:name="com.example.com.wingsbangladesh.PrinterMainActivity"
-            android:screenOrientation="portrait"
-            >
-
-        </activity>
 
 
 

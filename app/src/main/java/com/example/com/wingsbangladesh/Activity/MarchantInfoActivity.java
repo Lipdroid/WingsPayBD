@@ -50,6 +50,7 @@ public class MarchantInfoActivity extends AppCompatActivity  {
     private MarchantInfoAdapter mAdapter;
     String username, password, usertype, employeeName;
     TextView user;
+    String mJson;
 
 
     @Override
@@ -93,7 +94,7 @@ public class MarchantInfoActivity extends AppCompatActivity  {
 
         if (usertype.equals("Employee")) {
 
-            //  settings.setVisibility(View.GONE);
+             settings.setVisibility(View.GONE);
         }
 
 
@@ -142,7 +143,7 @@ public class MarchantInfoActivity extends AppCompatActivity  {
                 HttpResponse response = httpclient.execute(httppost);
 
                 HttpEntity httpEntity = response.getEntity();
-                String mJson = EntityUtils.toString(httpEntity);
+                 mJson = EntityUtils.toString(httpEntity);
 
                 Log.e("MarchantResponse", mJson.toString());
 
@@ -180,14 +181,31 @@ public class MarchantInfoActivity extends AppCompatActivity  {
 
                     marchantList.add(m);
 
+
+                    if(marchantList.size()==0){
+                        Toast.makeText(MarchantInfoActivity.this, "APi Response Failed,Please try Again!",
+                                Toast.LENGTH_LONG).show();
+
+
+                    }
+
                 }
 
 
             } catch (ClientProtocolException e) {
+
+                Toast.makeText(MarchantInfoActivity.this, "APi Response Failed,Please try Again!",
+                        Toast.LENGTH_LONG).show();
                 Log.e("Response", e.toString());
             } catch (IOException e) {
+
+                Toast.makeText(MarchantInfoActivity.this, "APi Response Failed,Please try Again!",
+                        Toast.LENGTH_LONG).show();
                 Log.e("Response", e.toString());
             } catch (JSONException e) {
+
+                Toast.makeText(MarchantInfoActivity.this, "APi Response Failed,Please try Again!",
+                        Toast.LENGTH_LONG).show();
                 e.printStackTrace();
             }
             return "";
@@ -197,6 +215,14 @@ public class MarchantInfoActivity extends AppCompatActivity  {
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
+
+            if (mJson .equals("[]") ) {
+
+                Toast.makeText(MarchantInfoActivity.this, "Login Failed,Please try Again!",
+                        Toast.LENGTH_LONG).show();
+
+
+            }
 
 
             mAdapter = new MarchantInfoAdapter(marchantList, username, password, usertype, merchantCode, employeeName);

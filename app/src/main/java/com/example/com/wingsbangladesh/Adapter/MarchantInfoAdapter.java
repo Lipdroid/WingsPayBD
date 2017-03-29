@@ -236,13 +236,13 @@ public class MarchantInfoAdapter extends RecyclerView.Adapter<MarchantInfoAdapte
         holder.send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                m=list.get(position);
                 Intent intent = new Intent(context, ConcernedMarchantPickupActivity.class);
 
                 intent.putExtra("username",username);
                 intent.putExtra("password",password);
                 intent.putExtra("usertype",usertype);
-                intent.putExtra("marchantcode",marchantcode);
+                intent.putExtra("marchantcode",m.getMerchantCode());
                 intent.putExtra("employeeName",employeeName);
 
                 context.startActivity(intent);

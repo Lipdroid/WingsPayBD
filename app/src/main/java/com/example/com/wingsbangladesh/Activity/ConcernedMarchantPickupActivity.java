@@ -48,6 +48,7 @@ public class ConcernedMarchantPickupActivity extends AppCompatActivity  {
     LinearLayout lnrLayout;
     Button logout;
     ImageView settings;
+    String mJson;
     String usertype, userid, marchantcode,username,password,employeeName;
 
     @Override
@@ -145,13 +146,13 @@ public class ConcernedMarchantPickupActivity extends AppCompatActivity  {
                 HttpResponse response = httpclient.execute(httppost);
 
                 HttpEntity httpEntity = response.getEntity();
-                String mJson = EntityUtils.toString(httpEntity);
+                 mJson = EntityUtils.toString(httpEntity);
 
                 Log.e("saadResponse", mJson.toString());
 
                 if(mJson.toString().length()==0){
 
-                    Toast.makeText(ConcernedMarchantPickupActivity.this, "Login Failed,Please try Again!",
+                    Toast.makeText(ConcernedMarchantPickupActivity.this, "Api response Failed,Please try Again!",
                             Toast.LENGTH_LONG).show();
 
                 }
@@ -189,17 +190,31 @@ public class ConcernedMarchantPickupActivity extends AppCompatActivity  {
 
 
 
+if(modelBarcodeList.size()==0){
+    Toast.makeText(ConcernedMarchantPickupActivity.this, "Api response Failed,Please try Again!",
+            Toast.LENGTH_LONG).show();
 
+
+}
 
 
                 }
 
 
             } catch (ClientProtocolException e) {
+
+                Toast.makeText(ConcernedMarchantPickupActivity.this,  "Api response Failed,Please try Again!",
+                        Toast.LENGTH_LONG).show();
                 Log.e("Response", e.toString());
             } catch (IOException e) {
+
+                Toast.makeText(ConcernedMarchantPickupActivity.this,  "Api response Failed,Please try Again!",
+                        Toast.LENGTH_LONG).show();
                 Log.e("Response", e.toString());
             } catch (JSONException e) {
+
+                Toast.makeText(ConcernedMarchantPickupActivity.this,  "Api response Failed,Please try Again!",
+                        Toast.LENGTH_LONG).show();
                 e.printStackTrace();
             }
             return "";
@@ -210,6 +225,14 @@ public class ConcernedMarchantPickupActivity extends AppCompatActivity  {
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
+
+            if (mJson .equals("[]") ) {
+
+                Toast.makeText(ConcernedMarchantPickupActivity.this, "Login Failed,Please try Again!",
+                        Toast.LENGTH_LONG).show();
+
+
+            }
 
             mAdapter = new ConcernedPickUpAdapter(modelBarcodeList);
             Log.e("saadtest",modelBarcodeList.toString());
