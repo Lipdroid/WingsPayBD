@@ -127,6 +127,7 @@ ModelBarcodeList p;
                 intent.putExtra("barcode", p.getBarcode());
 
                 context.startActivity(intent);
+
             }
         });
 

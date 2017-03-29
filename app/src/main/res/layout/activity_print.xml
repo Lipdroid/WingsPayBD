@@ -54,27 +54,33 @@ android:id="@+id/mother"
         android:background="#ff8800" />
 
 
+    <ImageView
+        android:id="@+id/saad"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+
+        />
+
     <LinearLayout
         android:id="@+id/barcodeid"
         android:layout_width="320dp"
         android:layout_height="160dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="10dp"
         android:background="@drawable/round_button"
         android:gravity="center"
         android:orientation="vertical"
-        android:padding="15dp"
-        android:layout_gravity="center"
-        android:layout_marginTop="10dp"
-        >
+        android:padding="15dp">
 
         <TextView
             android:id="@+id/paperfly_order_id"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="232131232133"
-            android:textSize="35dp"
-            android:textStyle="bold"
             android:textColor="@color/colorBlack"
-            />
+            android:textSize="35dp"
+            android:textStyle="bold" />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -87,10 +93,10 @@ android:id="@+id/mother"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="5dp"
-                android:textStyle="bold"
                 android:text="2321312323"
                 android:textColor="@color/colorBlack"
-                android:textSize="20dp" />
+                android:textSize="20dp"
+                android:textStyle="bold" />
 
             <View
                 android:layout_width="3dp"
@@ -102,10 +108,10 @@ android:id="@+id/mother"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="5dp"
-                android:textStyle="bold"
                 android:text="232131232133"
                 android:textColor="@color/colorBlack"
-                android:textSize="20dp" />
+                android:textSize="20dp"
+                android:textStyle="bold" />
 
         </LinearLayout>
 
@@ -122,8 +128,8 @@ android:id="@+id/mother"
                 android:padding="5dp"
                 android:text="232131232133"
                 android:textColor="@color/colorBlack"
-                android:textStyle="bold"
-                android:textSize="20dp" />
+                android:textSize="20dp"
+                android:textStyle="bold" />
 
             <View
                 android:layout_width="3dp"
@@ -136,16 +142,16 @@ android:id="@+id/mother"
                 android:layout_height="wrap_content"
                 android:padding="5dp"
                 android:text="232131232133"
-                android:textStyle="bold"
                 android:textColor="@color/colorBlack"
-                android:textSize="20dp" />
+                android:textSize="20dp"
+                android:textStyle="bold" />
 
         </LinearLayout>
 
         <ImageView
             android:id="@+id/barcode_img"
-            android:layout_width="250dp"
-            android:layout_height="100dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:padding="5dp" />
 
         <TextView
@@ -153,29 +159,21 @@ android:id="@+id/mother"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
-            android:textColor="@color/colorBlack"
             android:text="232131232133"
-            android:textSize="12dp" />
+            android:textColor="@color/colorBlack"
+            android:textSize="20dp" />
 
 
     </LinearLayout>
-
-    <ImageView
-        android:id="@+id/saad"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-
-        />
-<!--
-    <Button
-        android:id="@+id/btn_print_barcode"
-        android:gravity="center"
-        android:layout_margin="10dp"
-        android:layout_gravity="center"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Print" />-->
+    <!--
+        <Button
+            android:id="@+id/btn_print_barcode"
+            android:gravity="center"
+            android:layout_margin="10dp"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Print" />-->
 
 </LinearLayout>
 

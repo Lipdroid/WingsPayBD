@@ -59,7 +59,7 @@ public class PrintActivity extends AppCompatActivity {
 
     String barcode,orderId,marchantref,marchantcode,productprice,phone;
     TextView paperfy_order_id, marchent_ref, marchent_code, product_price, customer_phone, marchent_code2;
-    Bitmap targetImage;
+    private Bitmap targetImage=null;
     LinearLayout ln,view;
     ImageView barcode_imageView = null;
     ImageView bmImage;
@@ -157,34 +157,18 @@ public class PrintActivity extends AppCompatActivity {
         connectToBluetooth();
 
 
-        if(ConstantURLs.FLAG==1) {
+       // if(ConstantURLs.FLAG==1) {
 
 
             //enable bluetooth
-            mEnableBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
 
-                    startActivityForResult(intent, 1000);
-                }
-            });
 
-            //connect/disconnect
-            mConnectBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View arg0) {
-                    connect();
-                    new GetData().execute();
-                }
-            });
-
-        }
-        else{
+      //  }
+       /* else{
 
             showToast("Please Connect to the Bluetooth And Try Again!");
 
-        }
+        }*/
 
 
 
@@ -402,7 +386,7 @@ public class PrintActivity extends AppCompatActivity {
             bitmap.recycle();
             bytes = null;
 
-            finish();
+          //  finish();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -479,7 +463,7 @@ public class PrintActivity extends AppCompatActivity {
 
             pDialog.dismiss();
 
-            finish();
+           // finish();
 
 
         }
@@ -561,6 +545,24 @@ public class PrintActivity extends AppCompatActivity {
                 public void onDisconnected() {
                     showDisonnected();
                     ConstantURLs.FLAG=0;
+                }
+            });
+
+            mEnableBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+
+                    startActivityForResult(intent, 1000);
+                }
+            });
+
+            //connect/disconnect
+            mConnectBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View arg0) {
+                    connect();
+                    new GetData().execute();
                 }
             });
 
