@@ -153,8 +153,11 @@ public class PrintActivity extends AppCompatActivity {
 
 
 
+        if(ConstantURLs.FLAG==0){
 
-        connectToBluetooth();
+            connectToBluetooth();
+        }
+
 
 
        // if(ConstantURLs.FLAG==1) {
@@ -632,12 +635,12 @@ public class PrintActivity extends AppCompatActivity {
         barcodes.setResolution(72);
 
         // disply barcodes encoding data below the barcodes
-        barcodes.setShowText(true);
+    //    barcodes.setShowText(true);
         // barcodes encoding data font style
-        barcodes.setTextFont(new AndroidFont("Arial", Typeface.NORMAL, 12));
+      //  barcodes.setTextFont(new AndroidFont("Arial", Typeface.NORMAL, 12));
         // space between barcodes and barcodes encoding data
-        barcodes.setTextMargin(6);
-        barcodes.setTextColor(AndroidColor.black);
+       // barcodes.setTextMargin(6);
+        //barcodes.setTextColor(AndroidColor.black);
 
         // barcodes bar color and background color in Android device
         barcodes.setForeColor(AndroidColor.black);
@@ -687,12 +690,12 @@ public class PrintActivity extends AppCompatActivity {
         barcode.setResolution(72);
 
         // disply barcodes encoding data below the barcodes
-        barcode.setShowText(true);
+        //barcode.setShowText(true);
         // barcodes encoding data font style
-        barcode.setTextFont(new AndroidFont("Arial", Typeface.NORMAL, 12));
+        //barcode.setTextFont(new AndroidFont("Arial", Typeface.NORMAL, 12));
         // space between barcodes and barcodes encoding data
-        barcode.setTextMargin(6);
-        barcode.setTextColor(AndroidColor.black);
+        //barcode.setTextMargin(6);
+        //barcode.setTextColor(AndroidColor.black);
 
         // barcodes bar color and background color in Android device
         barcode.setForeColor(AndroidColor.black);
@@ -739,12 +742,12 @@ public class PrintActivity extends AppCompatActivity {
         // barcodes image resolution in dpi
         barcode.setResolution(720);
         // disply barcodes encoding data below the barcodes
-        barcode.setShowText(true);
+      //  barcode.setShowText(true);
         // barcodes encoding data font style
-        barcode.setTextFont(new AndroidFont("Arial", Typeface.NORMAL, 12));
+       // barcode.setTextFont(new AndroidFont("Arial", Typeface.NORMAL, 12));
         // space between barcodes and barcodes encoding data
-        barcode.setTextMargin(6);
-        barcode.setTextColor(AndroidColor.black);
+      //  barcode.setTextMargin(6);
+       // barcode.setTextColor(AndroidColor.black);
         // barcodes bar color and background color in Android device
         barcode.setForeColor(AndroidColor.black);
         barcode.setBackColor(AndroidColor.white);
@@ -758,7 +761,7 @@ public class PrintActivity extends AppCompatActivity {
         barcode_imageView.setImageBitmap(barcode_image);
 
 
-        Paint paint = new Paint();
+     /*   Paint paint = new Paint();
 
         //canvas.drawColor(Color.GREEN);
 
@@ -767,14 +770,14 @@ public class PrintActivity extends AppCompatActivity {
         c.drawRect(0, 0, 400, 400, paint);
 
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
-        paint.setTextSize(40);
-        paint.setTextScaleX(1.f);
+      //  paint.setTextSize(40);
+       // paint.setTextScaleX(1.f);
         paint.setAlpha(0);
         paint.setAntiAlias(true);
         // c.drawText("Your text2", 30, 40, paint);
-        c.drawText("Your text", 200, 200, paint);
+       // c.drawText("Your text", 200, 200, paint);
 
-        paint.setColor(Color.RED);
+        paint.setColor(Color.BLACK);*/
 
 
         //  canvas.drawBitmap(b, 10,10, paint);
