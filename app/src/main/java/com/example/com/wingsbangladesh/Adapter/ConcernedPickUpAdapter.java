@@ -1,5 +1,6 @@
 package com.example.com.wingsbangladesh.Adapter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.content.ContextCompat;
@@ -126,8 +127,8 @@ ModelBarcodeList p;
                 intent.putExtra("phone", p.getPhone());
                 intent.putExtra("barcode", p.getBarcode());
 
-                context.startActivity(intent);
-
+               /* context.startActivity(intent);
+                ((Activity)context).finish();*/
             }
         });
 

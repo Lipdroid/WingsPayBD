@@ -57,20 +57,25 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class PrintActivity extends AppCompatActivity {
 
-    String barcode,orderId,marchantref,marchantcode,productprice,phone;
-    TextView paperfy_order_id, marchent_ref, marchent_code, product_price, customer_phone, marchent_code2;
+    private String barcode=null;
+    private String   orderId=null;
+    private String   marchantref=null;
+    private String   marchantcode=null;
+    private String   productprice=null;
+    private String   phone=null;
+    private TextView paperfy_order_id, marchent_ref, marchent_code, product_price, customer_phone, marchent_code2;
     private Bitmap targetImage=null;
     LinearLayout ln,view;
     ImageView barcode_imageView = null;
     ImageView bmImage;
 
     private Button mConnectBtn,mEnableBtn;
-    private Spinner mDeviceSp;
-    private ProgressDialog mProgressDlg;
-    private ProgressDialog mConnectingDlg;
-    private BluetoothAdapter mBluetoothAdapter;
-    private P25Connector mConnector;
-    private ArrayList<BluetoothDevice> mDeviceList = new ArrayList<BluetoothDevice>();
+    private Spinner mDeviceSp=null;
+    private ProgressDialog mProgressDlg=null;
+    private ProgressDialog mConnectingDlg=null;
+    private BluetoothAdapter mBluetoothAdapter=null;
+    private P25Connector mConnector=null;
+    private ArrayList<BluetoothDevice> mDeviceList=null;
 
 
 
@@ -83,6 +88,7 @@ public class PrintActivity extends AppCompatActivity {
         setContentView(R.layout.activity_print);
 
 
+        mDeviceList = new ArrayList<BluetoothDevice>();
 
 
         Intent intent = getIntent();
@@ -153,10 +159,10 @@ public class PrintActivity extends AppCompatActivity {
 
 
 
-        if(ConstantURLs.FLAG==0){
+       // if(ConstantURLs.FLAG==0){
 
             connectToBluetooth();
-        }
+       // }
 
 
 
@@ -186,7 +192,6 @@ public class PrintActivity extends AppCompatActivity {
     }
 
     public void findViewById() {
-
 
 
         paperfy_order_id = (TextView) findViewById(R.id.paperfly_order_id);
@@ -382,14 +387,14 @@ public class PrintActivity extends AppCompatActivity {
 
             sendData(bytes);
 
-            byte[] newline = Printer.printfont("\n\n", FontDefine.FONT_32PX, FontDefine.Align_CENTER, (byte) 0x1A, PocketPos.LANGUAGE_ENGLISH);
+          //  byte[] newline = Printer.printfont("\n\n", FontDefine.FONT_32PX, FontDefine.Align_CENTER, (byte) 0x1A, PocketPos.LANGUAGE_ENGLISH);
 
-            sendData(newline);
+            //sendData(newline);
 
             bitmap.recycle();
             bytes = null;
 
-          //  finish();
+          // finish();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -466,7 +471,8 @@ public class PrintActivity extends AppCompatActivity {
 
             pDialog.dismiss();
 
-           // finish();
+            finish();
+
 
 //
         }
@@ -566,6 +572,7 @@ public class PrintActivity extends AppCompatActivity {
                 public void onClick(View arg0) {
                     connect();
                     new GetData().execute();
+
                 }
             });
 

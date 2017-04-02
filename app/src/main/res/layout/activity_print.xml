@@ -67,11 +67,11 @@ android:id="@+id/mother"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginTop="10dp"
+
         android:background="@drawable/round_button"
         android:gravity="center"
         android:orientation="vertical"
-        android:padding="15dp">
+        android:padding="5dp">
 
         <TextView
             android:id="@+id/paperfly_order_id"
@@ -79,24 +79,23 @@ android:id="@+id/mother"
             android:layout_height="wrap_content"
             android:text="232131232133"
             android:textColor="@color/colorBlack"
-            android:textSize="35dp"
+            android:textSize="15dp"
             android:textStyle="bold" />
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="5dp">
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/marchant_ref"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="2dp"
                 android:text="2321312323"
                 android:textColor="@color/colorBlack"
-                android:textSize="20dp"
-                android:textStyle="bold" />
+                android:textSize="15dp"
+                android:textStyle="bold"
+                android:layout_marginRight="2dp"/>
 
             <View
                 android:layout_width="3dp"
@@ -107,10 +106,9 @@ android:id="@+id/mother"
                 android:id="@+id/marchant_code"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="5dp"
                 android:text="232131232133"
                 android:textColor="@color/colorBlack"
-                android:textSize="20dp"
+                android:textSize="15dp"
                 android:textStyle="bold" />
 
         </LinearLayout>
@@ -119,16 +117,16 @@ android:id="@+id/mother"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:padding="2dp">
+          >
 
             <TextView
                 android:id="@+id/product_price"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="2dp"
                 android:text="232131232133"
                 android:textColor="@color/colorBlack"
-                android:textSize="20dp"
+                android:textSize="15dp"
+                android:layout_marginRight="2dp"
                 android:textStyle="bold" />
 
             <View
@@ -140,29 +138,28 @@ android:id="@+id/mother"
                 android:id="@+id/customer_phone"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="5dp"
                 android:text="232131232133"
                 android:textColor="@color/colorBlack"
-                android:textSize="20dp"
+                android:textSize="15dp"
                 android:textStyle="bold" />
 
         </LinearLayout>
 
         <ImageView
+            android:layout_margin="3dp"
             android:id="@+id/barcode_img"
-            android:layout_width="250dp"
-            android:layout_height="100dp"
-            android:padding="2dp" />
+            android:layout_width="320dp"
+            android:layout_height="150dp"
+      />
 
         <TextView
             android:id="@+id/marchant_code2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
             android:text="232131232133"
             android:textStyle="bold"
             android:textColor="@color/colorBlack"
-            android:textSize="20dp" />
+            android:textSize="15dp" />
 
 
     </LinearLayout>
