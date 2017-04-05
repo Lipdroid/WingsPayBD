@@ -15,7 +15,7 @@ android:id="@+id/mother"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#d9d7d7"
-            android:padding="@dimen/activity_vertical_margin">
+            android:padding="5dp">
 
             <Button
                 android:id="@+id/btn_enable"
@@ -148,8 +148,8 @@ android:id="@+id/mother"
         <ImageView
             android:layout_margin="3dp"
             android:id="@+id/barcode_img"
-            android:layout_width="320dp"
-            android:layout_height="150dp"
+            android:layout_width="300dp"
+            android:layout_height="140dp"
       />
 
         <TextView
