@@ -127,8 +127,8 @@ ModelBarcodeList p;
                 intent.putExtra("phone", p.getPhone());
                 intent.putExtra("barcode", p.getBarcode());
 
-               /* context.startActivity(intent);
-                ((Activity)context).finish();*/
+               context.startActivity(intent);
+               // ((Activity)context).finish();*/
             }
         });
 

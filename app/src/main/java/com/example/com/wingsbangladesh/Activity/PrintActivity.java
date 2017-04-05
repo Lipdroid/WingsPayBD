@@ -9,6 +9,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -65,7 +66,8 @@ public class PrintActivity extends AppCompatActivity {
     private String   phone=null;
     private TextView paperfy_order_id, marchent_ref, marchent_code, product_price, customer_phone, marchent_code2;
     private Bitmap targetImage=null;
-    LinearLayout ln,view;
+    LinearLayout ln;
+    LinearLayout view=null;
     ImageView barcode_imageView = null;
     ImageView bmImage;
 
@@ -76,6 +78,9 @@ public class PrintActivity extends AppCompatActivity {
     private BluetoothAdapter mBluetoothAdapter=null;
     private P25Connector mConnector=null;
     private ArrayList<BluetoothDevice> mDeviceList=null;
+
+   private  Bitmap bitmap=null;
+   private byte[] bytes=null;
 
 
 
@@ -158,26 +163,7 @@ public class PrintActivity extends AppCompatActivity {
         view.setVisibility(View.GONE);
 
 
-
-       // if(ConstantURLs.FLAG==0){
-
             connectToBluetooth();
-       // }
-
-
-
-       // if(ConstantURLs.FLAG==1) {
-
-
-            //enable bluetooth
-
-
-      //  }
-       /* else{
-
-            showToast("Please Connect to the Bluetooth And Try Again!");
-
-        }*/
 
 
 
@@ -322,7 +308,7 @@ public class PrintActivity extends AppCompatActivity {
 
     }
 
-    private void connect() {
+    private void   connect() {
         if (mDeviceList == null || mDeviceList.size() == 0) {
             return;
         }
@@ -382,17 +368,33 @@ public class PrintActivity extends AppCompatActivity {
 
 
 
-            Bitmap bitmap = Bitmap.createScaledBitmap(targetImage, 300, 210, true);
-            byte[] bytes = PrintTools_58mm.decodeBitmap(bitmap);
 
-            sendData(bytes);
 
-          //  byte[] newline = Printer.printfont("\n\n", FontDefine.FONT_32PX, FontDefine.Align_CENTER, (byte) 0x1A, PocketPos.LANGUAGE_ENGLISH);
+    bitmap = Bitmap.createScaledBitmap(targetImage, 300, 180, true);
 
-            //sendData(newline);
+            if(bitmap!=null) {
+    bytes = PrintTools_58mm.decodeBitmap(bitmap);
 
-            bitmap.recycle();
-            bytes = null;
+    sendData(bytes);
+
+    byte[] newline = Printer.printfont("\n\n", FontDefine.FONT_32PX, FontDefine.Align_CENTER, (byte) 0x1A, PocketPos.LANGUAGE_ENGLISH);
+
+    sendData(newline);
+
+
+}
+else{
+
+    System.out.println("SAADBITMAPIS NULL");
+}
+
+
+
+            targetImage=null;
+          //  bitmap.recycle();
+            bytes=null;
+
+
 
           // finish();
 
@@ -462,6 +464,12 @@ public class PrintActivity extends AppCompatActivity {
 
             printImage();
 
+
+            //Disable bluetooth
+
+
+
+
             return null;
         }
 
@@ -472,6 +480,9 @@ public class PrintActivity extends AppCompatActivity {
             pDialog.dismiss();
 
             finish();
+
+
+
 
 
 //
@@ -532,7 +543,6 @@ public class PrintActivity extends AppCompatActivity {
 
                     showConnected();
 
-                    ConstantURLs.FLAG=1;
 
                 }
 
@@ -540,20 +550,18 @@ public class PrintActivity extends AppCompatActivity {
                 public void onConnectionFailed(String error) {
                     mConnectingDlg.dismiss();
 
-                    ConstantURLs.FLAG=0;
+
 
                 }
 
                 @Override
                 public void onConnectionCancelled() {
                     mConnectingDlg.dismiss();
-                    ConstantURLs.FLAG=0;
                 }
 
                 @Override
                 public void onDisconnected() {
                     showDisonnected();
-                    ConstantURLs.FLAG=0;
                 }
             });
 

@@ -175,7 +175,7 @@ public class PrintTools_58mm {
             }
             heightHexString = heightHexString + "00";
 
-
+            commandList.clear();
             commandList.add(commandHexString + widthHexString + heightHexString);
             commandList.addAll(bmpHexList);
 
