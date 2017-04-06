@@ -58,30 +58,29 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
 
 public class PrintActivity extends AppCompatActivity {
 
-    private String barcode=null;
-    private String   orderId=null;
-    private String   marchantref=null;
-    private String   marchantcode=null;
-    private String   productprice=null;
-    private String   phone=null;
+    private String barcode = null;
+    private String orderId = null;
+    private String marchantref = null;
+    private String marchantcode = null;
+    private String productprice = null;
+    private String phone = null;
     private TextView paperfy_order_id, marchent_ref, marchent_code, product_price, customer_phone, marchent_code2;
-    private Bitmap targetImage=null;
+    private Bitmap targetImage = null;
     LinearLayout ln;
-    LinearLayout view=null;
+    LinearLayout view = null;
     ImageView barcode_imageView = null;
     ImageView bmImage;
 
-    private Button mConnectBtn,mEnableBtn;
-    private Spinner mDeviceSp=null;
-    private ProgressDialog mProgressDlg=null;
-    private ProgressDialog mConnectingDlg=null;
-    private BluetoothAdapter mBluetoothAdapter=null;
-    private P25Connector mConnector=null;
-    private ArrayList<BluetoothDevice> mDeviceList=null;
+    private Button mConnectBtn, mEnableBtn;
+    private Spinner mDeviceSp = null;
+    private ProgressDialog mProgressDlg = null;
+    private ProgressDialog mConnectingDlg = null;
+    private BluetoothAdapter mBluetoothAdapter = null;
+    private P25Connector mConnector = null;
+    private ArrayList<BluetoothDevice> mDeviceList = null;
 
-   private  Bitmap bitmap=null;
-   private byte[] bytes=null;
-
+    private Bitmap bitmap = null;
+    private byte[] bytes = null;
 
 
     @Override
@@ -100,28 +99,24 @@ public class PrintActivity extends AppCompatActivity {
         orderId = intent.getStringExtra("orderId");
         marchantref = intent.getStringExtra("marchantref");
         marchantcode = intent.getStringExtra("marchantcode");
-        productprice= intent.getStringExtra("productprice");
-        phone= intent.getStringExtra("phone");
-        barcode= intent.getStringExtra("barcode");
+        productprice = intent.getStringExtra("productprice");
+        phone = intent.getStringExtra("phone");
+        barcode = intent.getStringExtra("barcode");
 
 
         barcode_imageView = (ImageView) findViewById(R.id.barcode_img);
 
-       // getSupportActionBar().hide();
+        // getSupportActionBar().hide();
         findViewById();
 
 
-
-        if (barcode.length()==11) {
+        if (barcode.length() == 11) {
 
             //barcode = jsonObject.getString("barcode_upca");
             generateUPCACode(barcode);
 
 
-        }
-
-
-        else{
+        } else {
 
             Toast.makeText(PrintActivity.this, "No barcode found!",
                     Toast.LENGTH_LONG).show();
@@ -159,19 +154,17 @@ public class PrintActivity extends AppCompatActivity {
 
 
         //no need to set preview
-      //  bmImage.setImageBitmap(targetImage);
+        //  bmImage.setImageBitmap(targetImage);
         view.setVisibility(View.GONE);
 
 
-            connectToBluetooth();
-
+        connectToBluetooth();
 
 
     }
 
     @Override
-    public void onBackPressed()
-    {
+    public void onBackPressed() {
 
         super.onBackPressed();
         finish();
@@ -188,9 +181,9 @@ public class PrintActivity extends AppCompatActivity {
         customer_phone = (TextView) findViewById(R.id.customer_phone);
         mConnectBtn = (Button) findViewById(R.id.btn_connect);
         mEnableBtn = (Button) findViewById(R.id.btn_enable);
-     //   mPrintBarcodeBtn = (Button) findViewById(R.id.btn_print_barcode);
+        //   mPrintBarcodeBtn = (Button) findViewById(R.id.btn_print_barcode);
         mDeviceSp = (Spinner) findViewById(R.id.sp_device);
-        ln=(LinearLayout)findViewById(R.id.mother);
+        ln = (LinearLayout) findViewById(R.id.mother);
 
 
     }
@@ -282,7 +275,7 @@ public class PrintActivity extends AppCompatActivity {
         showToast("Bluetooth is unsupported by this device");
 
         mConnectBtn.setEnabled(false);
-     //   mPrintBarcodeBtn.setEnabled(false);
+        //   mPrintBarcodeBtn.setEnabled(false);
         mDeviceSp.setEnabled(false);
     }
 
@@ -291,7 +284,7 @@ public class PrintActivity extends AppCompatActivity {
 
         mConnectBtn.setText("Disconnect");
 
-       // mPrintBarcodeBtn.setEnabled(true);
+        // mPrintBarcodeBtn.setEnabled(true);
 
         mDeviceSp.setEnabled(false);
 
@@ -302,14 +295,15 @@ public class PrintActivity extends AppCompatActivity {
 
         mConnectBtn.setText("Connect");
 
-      //  mPrintBarcodeBtn.setEnabled(false);
+        //  mPrintBarcodeBtn.setEnabled(false);
 
         mDeviceSp.setEnabled(true);
 
     }
 
-    private void   connect() {
+    private void connect() {
         if (mDeviceList == null || mDeviceList.size() == 0) {
+            showToast("Can not find that device");
             return;
         }
 
@@ -320,7 +314,6 @@ public class PrintActivity extends AppCompatActivity {
                 createBond(device);
             } catch (Exception e) {
                 showToast("Failed to pair device");
-
                 return;
             }
         }
@@ -343,11 +336,8 @@ public class PrintActivity extends AppCompatActivity {
         try {
             Class<?> cl = Class.forName("android.bluetooth.BluetoothDevice");
             Class<?>[] par = {};
-
             Method method = cl.getMethod("createBond", par);
-
             method.invoke(device);
-
         } catch (Exception e) {
             e.printStackTrace();
 
@@ -365,39 +355,19 @@ public class PrintActivity extends AppCompatActivity {
 
     private void printImage() {
         try {
-
-
-
-
-
-    bitmap = Bitmap.createScaledBitmap(targetImage, 300, 160, true);
-
-            if(bitmap!=null) {
-    bytes = PrintTools_58mm.decodeBitmap(bitmap);
-
-    sendData(bytes);
-
-    byte[] newline = Printer.printfont("\n\n", FontDefine.FONT_32PX, FontDefine.Align_CENTER, (byte) 0x1A, PocketPos.LANGUAGE_ENGLISH);
-
-    sendData(newline);
-
-
-}
-else{
-
-    System.out.println("SAADBITMAPIS NULL");
-}
-
-
-
-            targetImage=null;
-          //  bitmap.recycle();
-            bytes=null;
-
-
-
-          // finish();
-
+            bitmap = Bitmap.createScaledBitmap(targetImage, 300, 160, true);
+            if (bitmap != null) {
+                bytes = PrintTools_58mm.decodeBitmap(bitmap);
+                sendData(bytes);
+                byte[] newline = Printer.printfont("\n\n", FontDefine.FONT_32PX, FontDefine.Align_CENTER, (byte) 0x1A, PocketPos.LANGUAGE_ENGLISH);
+                sendData(newline);
+            } else {
+                System.out.println("SAADBITMAPIS NULL");
+            }
+            targetImage = null;
+            //  bitmap.recycle();
+            bytes = null;
+            // finish();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -435,7 +405,6 @@ else{
 
                 if (state == BluetoothDevice.BOND_BONDED) {
                     showToast("Paired");
-
                     connect();
                 }
             }
@@ -448,8 +417,6 @@ else{
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-
-
             pDialog = new SweetAlertDialog(PrintActivity.this, SweetAlertDialog.PROGRESS_TYPE);
             pDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
             pDialog.setTitleText("Loading");
@@ -460,37 +427,22 @@ else{
 
         @Override
         protected Boolean doInBackground(Void... uRls) {
-
-
             printImage();
-
-
             //Disable bluetooth
-
-
-
-
             return null;
         }
 
         @Override
         protected void onPostExecute(Boolean result) {
             super.onPostExecute(result);
-
             pDialog.dismiss();
-
             finish();
-
-
-
-
-
 //
         }
 
     }
 
-    private void connectToBluetooth(){
+    private void connectToBluetooth() {
 
 
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -513,7 +465,6 @@ else{
             }
 
             mProgressDlg = new ProgressDialog(this);
-
             mProgressDlg.setMessage("Scanning...");
             mProgressDlg.setCancelable(false);
             mProgressDlg.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
@@ -526,7 +477,6 @@ else{
             });
 
             mConnectingDlg = new ProgressDialog(this);
-
             mConnectingDlg.setMessage("Connecting...");
             mConnectingDlg.setCancelable(false);
 
@@ -542,14 +492,13 @@ else{
                     mConnectingDlg.dismiss();
 
                     showConnected();
-
+                    new GetData().execute();
 
                 }
 
                 @Override
                 public void onConnectionFailed(String error) {
                     mConnectingDlg.dismiss();
-
 
 
                 }
@@ -569,7 +518,6 @@ else{
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-
                     startActivityForResult(intent, 1000);
                 }
             });
@@ -579,7 +527,7 @@ else{
                 @Override
                 public void onClick(View arg0) {
                     connect();
-                    new GetData().execute();
+//                    new GetData().executete();
 
                 }
             });
@@ -650,11 +598,11 @@ else{
         barcodes.setResolution(72);
 
         // disply barcodes encoding data below the barcodes
-    //    barcodes.setShowText(true);
+        //    barcodes.setShowText(true);
         // barcodes encoding data font style
-      //  barcodes.setTextFont(new AndroidFont("Arial", Typeface.NORMAL, 12));
+        //  barcodes.setTextFont(new AndroidFont("Arial", Typeface.NORMAL, 12));
         // space between barcodes and barcodes encoding data
-       // barcodes.setTextMargin(6);
+        // barcodes.setTextMargin(6);
         //barcodes.setTextColor(AndroidColor.black);
 
         // barcodes bar color and background color in Android device
@@ -757,12 +705,12 @@ else{
         // barcodes image resolution in dpi
         barcode.setResolution(720);
         // disply barcodes encoding data below the barcodes
-      //  barcode.setShowText(true);
+        //  barcode.setShowText(true);
         // barcodes encoding data font style
-       // barcode.setTextFont(new AndroidFont("Arial", Typeface.NORMAL, 12));
+        // barcode.setTextFont(new AndroidFont("Arial", Typeface.NORMAL, 12));
         // space between barcodes and barcodes encoding data
-      //  barcode.setTextMargin(6);
-       // barcode.setTextColor(AndroidColor.black);
+        //  barcode.setTextMargin(6);
+        // barcode.setTextColor(AndroidColor.black);
         // barcodes bar color and background color in Android device
         barcode.setForeColor(AndroidColor.black);
         barcode.setBackColor(AndroidColor.white);

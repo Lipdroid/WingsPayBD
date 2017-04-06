@@ -56,6 +56,7 @@ public class LoginActivity extends AppCompatActivity {
     String URL = "http://paperfly.com.bd/la.php";
     Button login;
     String mJson;
+    private SweetAlertDialog pDialog = null;
 
 
     @Override
@@ -118,12 +119,11 @@ public class LoginActivity extends AppCompatActivity {
                 //execute http post
                 HttpResponse response = httpclient.execute(httppost);
                 HttpEntity httpEntity = response.getEntity();
-                 mJson = EntityUtils.toString(httpEntity);
+                mJson = EntityUtils.toString(httpEntity);
 
-                System.out.println("sss"+response);
+                System.out.println("sss" + response);
 
                 Log.e("Response", mJson.toString());
-
 
 
                 JSONArray jsonarray = new JSONArray(mJson);
@@ -148,15 +148,19 @@ public class LoginActivity extends AppCompatActivity {
 
 
             } catch (ClientProtocolException e) {
-
+                pDialog.dismiss();
                 Toast.makeText(LoginActivity.this, "Login Failed,Please try Again!",
                         Toast.LENGTH_LONG).show();
                 Log.e("Response", e.toString());
             } catch (IOException e) {
+                pDialog.dismiss();
+
                 Toast.makeText(LoginActivity.this, "Login Failed,Please try Again!",
                         Toast.LENGTH_LONG).show();
                 Log.e("Response", e.toString());
             } catch (JSONException e) {
+                pDialog.dismiss();
+
                 Toast.makeText(LoginActivity.this, "Login Failed,Please try Again!",
                         Toast.LENGTH_LONG).show();
                 e.printStackTrace();
@@ -165,11 +169,21 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pDialog = new SweetAlertDialog(LoginActivity.this, SweetAlertDialog.PROGRESS_TYPE);
+            pDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
+            pDialog.setTitleText("Loading");
+            pDialog.setCancelable(false);
+            pDialog.show();
+        }
+
+        @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
+            pDialog.dismiss();
 
-
-            if (mJson .equals("[]") ) {
+            if (mJson.equals("[]")) {
 
                 Toast.makeText(LoginActivity.this, "Login Failed,Please try Again!",
                         Toast.LENGTH_LONG).show();
