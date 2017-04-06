@@ -27,4 +27,5 @@
     <string name="text_print_image">Print Image</string>
     <string name="text_print_receipt">Print Receipt</string>
     <string name="text_print_text">Print Text</string>
+    <string name="text_print">Print</string>
 </resources>

@@ -31,7 +31,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
-                android:text="@string/text_connect" />
+                android:text="@string/text_print" />
 
             <Spinner
                 android:id="@+id/sp_device"
