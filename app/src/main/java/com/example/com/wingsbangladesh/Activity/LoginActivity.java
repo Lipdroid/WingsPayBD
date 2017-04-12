@@ -1,5 +1,6 @@
 package com.example.com.wingsbangladesh.Activity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
@@ -25,6 +26,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.com.wingsbangladesh.Adapter.MarchantInfoAdapter;
 import com.example.com.wingsbangladesh.R;
+import com.example.com.wingsbangladesh.util.ConnectionDetector;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -42,6 +44,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -57,6 +60,7 @@ public class LoginActivity extends AppCompatActivity {
     Button login;
     String mJson;
     private SweetAlertDialog pDialog = null;
+    private ConnectionDetector cd = null;
 
 
     @Override
@@ -66,6 +70,8 @@ public class LoginActivity extends AppCompatActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_login);
+
+        cd = new ConnectionDetector(this);
 
         getSupportActionBar().hide();
 
@@ -84,7 +90,14 @@ public class LoginActivity extends AppCompatActivity {
                 usernameText = usernameText.trim();
                 passwordText = passwordText.trim();
 
-                new PostTask().execute();
+
+                if (cd.isConnectingToInternet()) {
+                    new PostTask().execute();
+                } else {
+
+                    Toast.makeText(LoginActivity.this, "No Internet Connection!",
+                            Toast.LENGTH_LONG).show();
+                }
 
             }
         });
@@ -145,27 +158,24 @@ public class LoginActivity extends AppCompatActivity {
                     startActivity(intent);
 
                 }
+                return "success";
 
+            }
 
-            } catch (ClientProtocolException e) {
+            catch (ClientProtocolException e) {
                 pDialog.dismiss();
-                Toast.makeText(LoginActivity.this, "Login Failed,Please try Again!",
-                        Toast.LENGTH_LONG).show();
-                Log.e("Response", e.toString());
+                return "Authentication Failed!";
+
+
             } catch (IOException e) {
                 pDialog.dismiss();
 
-                Toast.makeText(LoginActivity.this, "Login Failed,Please try Again!",
-                        Toast.LENGTH_LONG).show();
-                Log.e("Response", e.toString());
+                return "Authentication Failed!";
             } catch (JSONException e) {
                 pDialog.dismiss();
-
-                Toast.makeText(LoginActivity.this, "Login Failed,Please try Again!",
-                        Toast.LENGTH_LONG).show();
-                e.printStackTrace();
+                return "Authentication Failed!";
             }
-            return "";
+
         }
 
         @Override
@@ -185,9 +195,16 @@ public class LoginActivity extends AppCompatActivity {
 
             if (mJson.equals("[]")) {
 
-                Toast.makeText(LoginActivity.this, "Login Failed,Please try Again!",
+                Toast.makeText(LoginActivity.this, "Authentication Failed!",
                         Toast.LENGTH_LONG).show();
 
+
+            }
+
+            if(result.equals("Authentication Failed!")){
+
+                Toast.makeText(LoginActivity.this, result,
+                        Toast.LENGTH_LONG).show();
 
             }
 

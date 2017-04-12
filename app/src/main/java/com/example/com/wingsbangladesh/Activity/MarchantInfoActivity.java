@@ -18,9 +18,12 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import com.example.com.wingsbangladesh.Adapter.MarchantInfoAdapter;
 import com.example.com.wingsbangladesh.Model.MarchantModel;
 import com.example.com.wingsbangladesh.R;
+import com.example.com.wingsbangladesh.util.ConnectionDetector;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -34,20 +37,22 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class MarchantInfoActivity extends AppCompatActivity  {
+public class MarchantInfoActivity extends AppCompatActivity {
 
     String merchantCode;
-    private String URL="http://paperfly.com.bd/merchantAPI.php";
+    private String URL = "http://paperfly.com.bd/merchantAPI.php";
     Button logout;
     ImageView settings;
     private List<MarchantModel> marchantList = new ArrayList<>();
     private RecyclerView recyclerView;
     private MarchantInfoAdapter mAdapter;
+    private ConnectionDetector cd=null;
     String username, password, usertype, employeeName;
     TextView user;
     String mJson;
@@ -64,6 +69,8 @@ public class MarchantInfoActivity extends AppCompatActivity  {
         ActivityCompat.requestPermissions(MarchantInfoActivity.this,
                 new String[]{Manifest.permission.CALL_PHONE},
                 1);
+
+        cd=new ConnectionDetector(this);
 
 
         Intent intent = getIntent();
@@ -94,7 +101,7 @@ public class MarchantInfoActivity extends AppCompatActivity  {
 
         if (usertype.equals("Employee")) {
 
-             settings.setVisibility(View.GONE);
+            settings.setVisibility(View.GONE);
         }
 
 
@@ -111,12 +118,18 @@ public class MarchantInfoActivity extends AppCompatActivity  {
 
         getSupportActionBar().hide();
 
-        new PostTask().execute();
+        if(cd.isConnectingToInternet()) {
 
+            new PostTask().execute();
+        }
+        else{
+
+
+            Toast.makeText(MarchantInfoActivity.this, "No Internet Connection!",
+                    Toast.LENGTH_LONG).show();
+        }
 
     }
-
-
 
 
     private class PostTask extends AsyncTask<String[], String, String> {
@@ -143,17 +156,10 @@ public class MarchantInfoActivity extends AppCompatActivity  {
                 HttpResponse response = httpclient.execute(httppost);
 
                 HttpEntity httpEntity = response.getEntity();
-                 mJson = EntityUtils.toString(httpEntity);
+                mJson = EntityUtils.toString(httpEntity);
 
                 Log.e("MarchantResponse", mJson.toString());
 
-                if (mJson.toString().length() == 0) {
-
-                    Toast.makeText(MarchantInfoActivity.this, "APi Response Failed,Please try Again!",
-                            Toast.LENGTH_LONG).show();
-
-
-                }
 
                 JSONArray jsonarray = new JSONArray(mJson);
 
@@ -182,33 +188,22 @@ public class MarchantInfoActivity extends AppCompatActivity  {
                     marchantList.add(m);
 
 
-                    if(marchantList.size()==0){
-                        Toast.makeText(MarchantInfoActivity.this, "APi Response Failed,Please try Again!",
-                                Toast.LENGTH_LONG).show();
-
-
-                    }
-
                 }
-
+                return "success";
 
             } catch (ClientProtocolException e) {
 
-                Toast.makeText(MarchantInfoActivity.this, "APi Response Failed,Please try Again!",
-                        Toast.LENGTH_LONG).show();
-                Log.e("Response", e.toString());
+                return  "No data!";
+
             } catch (IOException e) {
 
-                Toast.makeText(MarchantInfoActivity.this, "APi Response Failed,Please try Again!",
-                        Toast.LENGTH_LONG).show();
-                Log.e("Response", e.toString());
+                return  "No data!";
             } catch (JSONException e) {
 
-                Toast.makeText(MarchantInfoActivity.this, "APi Response Failed,Please try Again!",
-                        Toast.LENGTH_LONG).show();
-                e.printStackTrace();
+
+                return  "No data!";
             }
-            return "";
+
         }
 
 
@@ -216,17 +211,23 @@ public class MarchantInfoActivity extends AppCompatActivity  {
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
 
-            if (mJson .equals("[]") ) {
+            if (mJson.equals("[]")) {
 
-                Toast.makeText(MarchantInfoActivity.this, "Login Failed,Please try Again!",
+                Toast.makeText(MarchantInfoActivity.this,  "No data!",
                         Toast.LENGTH_LONG).show();
 
 
             }
 
+            if (result.equals("success")) {
 
-            mAdapter = new MarchantInfoAdapter(marchantList, username, password, usertype, merchantCode, employeeName);
-            recyclerView.setAdapter(mAdapter);
+
+                mAdapter = new MarchantInfoAdapter(marchantList, username, password, usertype, merchantCode, employeeName);
+                recyclerView.setAdapter(mAdapter);
+            } else {
+                Toast.makeText(MarchantInfoActivity.this, result,
+                        Toast.LENGTH_LONG).show();
+            }
 
 
         }

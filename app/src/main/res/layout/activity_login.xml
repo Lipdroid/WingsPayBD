@@ -73,7 +73,7 @@ android:layout_margin="5sp"
                 android:gravity="center"
                 android:layout_margin="5dp"
                 android:textSize="30dp"
-                android:text="WINGS Bar Code Generator" />
+                android:text="WINGS Barcode Generator" />
 
         </LinearLayout>
 

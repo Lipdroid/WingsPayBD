@@ -50,7 +50,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight=".8"
                 android:gravity="right"
-                android:text="Pick-upSummary For"
+                android:text="Pickup summary for"
                 android:textSize="18dp"
                 android:textStyle="bold" />
 
@@ -178,7 +178,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:gravity="center"
-                        android:text="L/s/s++ order count"
+                        android:text="L/s/s++ Order Count"
                         android:textColor="@color/colorWhite"
 
                         />
