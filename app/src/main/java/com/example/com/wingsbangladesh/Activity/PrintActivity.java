@@ -110,7 +110,7 @@ public class PrintActivity extends AppCompatActivity {
         findViewById();
 
 
-        if (barcode.length() == 11) {
+        if (barcode.length() == 11 || barcode.length() == 12) {
 
             //barcode = jsonObject.getString("barcode_upca");
             generateUPCACode(barcode);

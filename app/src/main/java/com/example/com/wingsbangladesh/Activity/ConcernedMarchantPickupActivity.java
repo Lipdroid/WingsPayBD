@@ -110,9 +110,9 @@ public class ConcernedMarchantPickupActivity extends AppCompatActivity {
 
         getSupportActionBar().hide();
 
-
-        user.setText(employeeName);
-
+if(employeeName!=null) {
+    user.setText(employeeName);
+}
         if (cd.isConnectingToInternet()) {
 
             new PostTask().execute();

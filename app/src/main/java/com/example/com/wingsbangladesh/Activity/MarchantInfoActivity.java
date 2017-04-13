@@ -86,7 +86,11 @@ public class MarchantInfoActivity extends AppCompatActivity {
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
 
-        user.setText(employeeName);
+
+        if(employeeName!=null) {
+
+            user.setText(employeeName);
+        }
 
 
         logout = (Button) findViewById(R.id.logout);

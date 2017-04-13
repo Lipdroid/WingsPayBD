@@ -2,10 +2,12 @@ package com.example.com.wingsbangladesh.Activity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.ShareActionProvider;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -27,6 +29,7 @@ import com.android.volley.toolbox.Volley;
 import com.example.com.wingsbangladesh.Adapter.MarchantInfoAdapter;
 import com.example.com.wingsbangladesh.R;
 import com.example.com.wingsbangladesh.util.ConnectionDetector;
+import com.example.com.wingsbangladesh.util.ConstantURLs;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -92,7 +95,21 @@ public class LoginActivity extends AppCompatActivity {
 
 
                 if (cd.isConnectingToInternet()) {
-                    new PostTask().execute();
+                    SharedPreferences prefs = getSharedPreferences(ConstantURLs.PREF_NAME, Context.MODE_PRIVATE);
+
+                    String loginApi_txt = prefs.getString(ConstantURLs.LOGIN_API_KEY, ConstantURLs.LOGIN_URL);
+                    String marchantApi_txt = prefs.getString(ConstantURLs.MERCHANT_API_KEY, ConstantURLs.MERCHANT_INFO_URL);
+                    String barcodeApi_txt = prefs.getString(ConstantURLs.BARCODE_LIST_API_KEY, ConstantURLs.BARCODE_LIST_URL);
+                    String barcode_type_txt = prefs.getString(ConstantURLs.BARCODE_TYPE_KEY, "UPC-A");
+
+
+                    if (loginApi_txt.equals(ConstantURLs.LOGIN_URL) && marchantApi_txt.equals(ConstantURLs.MERCHANT_INFO_URL) && barcodeApi_txt.equals(ConstantURLs.BARCODE_LIST_URL) && barcode_type_txt.equals("UPC-A"))
+                    {
+                        new PostTask().execute();
+                    }else{
+                        Toast.makeText(LoginActivity.this, "Api url chaged by admin",
+                                Toast.LENGTH_LONG).show();
+                    }
                 } else {
 
                     Toast.makeText(LoginActivity.this, "No Internet Connection!",
@@ -160,9 +177,7 @@ public class LoginActivity extends AppCompatActivity {
                 }
                 return "success";
 
-            }
-
-            catch (ClientProtocolException e) {
+            } catch (ClientProtocolException e) {
                 pDialog.dismiss();
                 return "Authentication Failed!";
 
@@ -201,7 +216,7 @@ public class LoginActivity extends AppCompatActivity {
 
             }
 
-            if(result.equals("Authentication Failed!")){
+            if (result.equals("Authentication Failed!")) {
 
                 Toast.makeText(LoginActivity.this, result,
                         Toast.LENGTH_LONG).show();
