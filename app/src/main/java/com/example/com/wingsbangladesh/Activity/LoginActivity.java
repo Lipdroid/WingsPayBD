@@ -64,7 +64,7 @@ public class LoginActivity extends AppCompatActivity {
     String mJson;
     private SweetAlertDialog pDialog = null;
     private ConnectionDetector cd = null;
-
+    SharedPreferences prefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +75,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         cd = new ConnectionDetector(this);
+         prefs = getSharedPreferences(ConstantURLs.PREF_NAME, Context.MODE_PRIVATE);
 
         getSupportActionBar().hide();
 
@@ -95,21 +96,20 @@ public class LoginActivity extends AppCompatActivity {
 
 
                 if (cd.isConnectingToInternet()) {
-                    SharedPreferences prefs = getSharedPreferences(ConstantURLs.PREF_NAME, Context.MODE_PRIVATE);
 
-                    String loginApi_txt = prefs.getString(ConstantURLs.LOGIN_API_KEY, ConstantURLs.LOGIN_URL);
-                    String marchantApi_txt = prefs.getString(ConstantURLs.MERCHANT_API_KEY, ConstantURLs.MERCHANT_INFO_URL);
-                    String barcodeApi_txt = prefs.getString(ConstantURLs.BARCODE_LIST_API_KEY, ConstantURLs.BARCODE_LIST_URL);
-                    String barcode_type_txt = prefs.getString(ConstantURLs.BARCODE_TYPE_KEY, "UPC-A");
-
-
-                    if (loginApi_txt.equals(ConstantURLs.LOGIN_URL) && marchantApi_txt.equals(ConstantURLs.MERCHANT_INFO_URL) && barcodeApi_txt.equals(ConstantURLs.BARCODE_LIST_URL) && barcode_type_txt.equals("UPC-A"))
-                    {
+//                    String loginApi_txt = prefs.getString(ConstantURLs.LOGIN_API_KEY, ConstantURLs.LOGIN_URL);
+//                    String marchantApi_txt = prefs.getString(ConstantURLs.MERCHANT_API_KEY, ConstantURLs.MERCHANT_INFO_URL);
+//                    String barcodeApi_txt = prefs.getString(ConstantURLs.BARCODE_LIST_API_KEY, ConstantURLs.BARCODE_LIST_URL);
+//                    String barcode_type_txt = prefs.getString(ConstantURLs.BARCODE_TYPE_KEY, "UPC-A");
+//
+//
+//                    if (loginApi_txt.equals(ConstantURLs.LOGIN_URL) && marchantApi_txt.equals(ConstantURLs.MERCHANT_INFO_URL) && barcodeApi_txt.equals(ConstantURLs.BARCODE_LIST_URL) && barcode_type_txt.equals("UPC-A"))
+//                    {
                         new PostTask().execute();
-                    }else{
-                        Toast.makeText(LoginActivity.this, "Api url chaged by admin",
-                                Toast.LENGTH_LONG).show();
-                    }
+//                    }else{
+//                        Toast.makeText(LoginActivity.this, "Api url chaged by admin",
+//                                Toast.LENGTH_LONG).show();
+//                    }
                 } else {
 
                     Toast.makeText(LoginActivity.this, "No Internet Connection!",
@@ -136,6 +136,7 @@ public class LoginActivity extends AppCompatActivity {
         protected String doInBackground(String[]... data) {
             // Create a new HttpClient and Post Header
             HttpClient httpclient = new DefaultHttpClient();
+            URL=prefs.getString(ConstantURLs.LOGIN_API_KEY, ConstantURLs.LOGIN_URL);
             HttpPost httppost = new HttpPost(URL);
 
             try {

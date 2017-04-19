@@ -3,6 +3,7 @@ package com.example.com.wingsbangladesh.Activity;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
@@ -23,6 +24,7 @@ import com.example.com.wingsbangladesh.Adapter.MarchantInfoAdapter;
 import com.example.com.wingsbangladesh.Model.MarchantModel;
 import com.example.com.wingsbangladesh.R;
 import com.example.com.wingsbangladesh.util.ConnectionDetector;
+import com.example.com.wingsbangladesh.util.ConstantURLs;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -56,6 +58,7 @@ public class MarchantInfoActivity extends AppCompatActivity {
     String username, password, usertype, employeeName;
     TextView user;
     String mJson;
+    SharedPreferences prefs;
 
 
     @Override
@@ -71,6 +74,7 @@ public class MarchantInfoActivity extends AppCompatActivity {
                 1);
 
         cd=new ConnectionDetector(this);
+        prefs = getSharedPreferences(ConstantURLs.PREF_NAME, Context.MODE_PRIVATE);
 
 
         Intent intent = getIntent();
@@ -87,9 +91,13 @@ public class MarchantInfoActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(mLayoutManager);
 
 
-        if(employeeName!=null) {
+        if(employeeName.equals(null)) {
 
             user.setText(employeeName);
+        }
+        else{
+            user.setText(" ");
+
         }
 
 
@@ -146,6 +154,8 @@ public class MarchantInfoActivity extends AppCompatActivity {
         protected String doInBackground(String[]... data) {
             // Create a new HttpClient and Post Header
             HttpClient httpclient = new DefaultHttpClient();
+            URL=prefs.getString(ConstantURLs.MERCHANT_API_KEY, ConstantURLs.MERCHANT_INFO_URL);
+
             HttpPost httppost = new HttpPost(URL);
 
             try {
