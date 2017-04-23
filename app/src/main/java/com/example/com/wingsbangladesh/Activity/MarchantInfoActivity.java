@@ -91,7 +91,7 @@ public class MarchantInfoActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(mLayoutManager);
 
 
-        if(!employeeName.equals(null)) {
+        if(!employeeName.equals("null")) {
 
             user.setText(employeeName);
             //
