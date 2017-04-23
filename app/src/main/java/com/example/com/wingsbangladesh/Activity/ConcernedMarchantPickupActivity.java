@@ -1,8 +1,6 @@
 package com.example.com.wingsbangladesh.Activity;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -17,13 +15,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.example.com.wingsbangladesh.Adapter.ConcernedPickUpAdapter;
 import com.example.com.wingsbangladesh.Model.ModelBarcodeList;
 import com.example.com.wingsbangladesh.R;
-import com.example.com.wingsbangladesh.util.ConnectionDetector;
-import com.example.com.wingsbangladesh.util.ConstantURLs;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -37,13 +31,12 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class ConcernedMarchantPickupActivity extends AppCompatActivity {
+public class ConcernedMarchantPickupActivity extends AppCompatActivity  {
 
     private List<ModelBarcodeList> modelBarcodeList = new ArrayList<>();
     TextView user;
@@ -53,10 +46,7 @@ public class ConcernedMarchantPickupActivity extends AppCompatActivity {
     Button logout;
     ImageView settings;
     String mJson;
-    String usertype, userid, marchantcode, username, password, employeeName;
-    private ConnectionDetector cd = null;
-    String URL= "http://paperfly.com.bd/barcodeList.php";
-    SharedPreferences prefs;
+    String usertype, userid, marchantcode,username,password,employeeName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,16 +56,13 @@ public class ConcernedMarchantPickupActivity extends AppCompatActivity {
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.concerned_marchant_pickup_list);
 
-        cd = new ConnectionDetector(this);
-        prefs = getSharedPreferences(ConstantURLs.PREF_NAME, Context.MODE_PRIVATE);
-
-        Intent intent = getIntent();
+        Intent intent=getIntent();
 
         username = intent.getStringExtra("username");
         password = intent.getStringExtra("password");
         usertype = intent.getStringExtra("usertype");
-        marchantcode = intent.getStringExtra("marchantcode");
-        employeeName = intent.getStringExtra("employeeName");
+        marchantcode=intent.getStringExtra("marchantcode");
+        employeeName=intent.getStringExtra("employeeName");
 
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
@@ -109,24 +96,18 @@ public class ConcernedMarchantPickupActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 finish();
-                Intent intent = new Intent(ConcernedMarchantPickupActivity.this, LoginActivity.class);
+                Intent intent=new Intent(ConcernedMarchantPickupActivity.this,LoginActivity.class);
                 startActivity(intent);
             }
         });
 
         getSupportActionBar().hide();
 
-if(employeeName!=null) {
-    user.setText(employeeName);
-}
-        if (cd.isConnectingToInternet()) {
 
-            new PostTask().execute();
-        } else {
+        user.setText(employeeName);
 
-            Toast.makeText(ConcernedMarchantPickupActivity.this, "No Internet Connection!",
-                    Toast.LENGTH_LONG).show();
-        }
+        new PostTask().execute();
+
 
 
     }
@@ -147,10 +128,7 @@ if(employeeName!=null) {
         protected String doInBackground(String[]... data) {
             // Create a new HttpClient and Post Header
             HttpClient httpclient = new DefaultHttpClient();
-
- URL = prefs.getString(ConstantURLs.BARCODE_LIST_API_KEY, ConstantURLs.BARCODE_LIST_URL);
-
-            HttpPost httppost = new HttpPost(URL);
+            HttpPost httppost = new HttpPost("http://paperfly.com.bd/barcodeList.php");
 
             try {
 
@@ -166,16 +144,23 @@ if(employeeName!=null) {
                 HttpResponse response = httpclient.execute(httppost);
 
                 HttpEntity httpEntity = response.getEntity();
-                mJson = EntityUtils.toString(httpEntity);
+                 mJson = EntityUtils.toString(httpEntity);
 
                 Log.e("saadResponse", mJson.toString());
 
+                if(mJson.toString().length()==0){
+
+                    Toast.makeText(ConcernedMarchantPickupActivity.this, "Api response Failed,Please try Again!",
+                            Toast.LENGTH_LONG).show();
+
+                }
 
                 JSONArray jsonarray = new JSONArray(mJson);
 
 
                 for (int i = 0; i < jsonarray.length(); i++) {
                     JSONObject obj = jsonarray.getJSONObject(i);
+
 
 
                     String orderid = obj.getString("orderid");
@@ -186,8 +171,9 @@ if(employeeName!=null) {
                     String phone = obj.getString("phone");
 
 
+
                     ModelBarcodeList m = new ModelBarcodeList();
-                    //  m.setBarcodeId(barcode_id);
+                  //  m.setBarcodeId(barcode_id);
                     m.setOrderid(orderid);
                     m.setBarcode(barcode);
                     m.setMerchantCode(merchantCode);
@@ -199,42 +185,58 @@ if(employeeName!=null) {
                     modelBarcodeList.add(m);
 
 
+
+
+
+if(modelBarcodeList.size()==0){
+    Toast.makeText(ConcernedMarchantPickupActivity.this, "Api response Failed,Please try Again!",
+            Toast.LENGTH_LONG).show();
+
+
+}
+
+
                 }
-                return "success";
 
 
             } catch (ClientProtocolException e) {
-                return "No data!";
-            } catch (IOException e) {
-                return  "No data!";
-            } catch (JSONException e) {
-                return  "No data!";
-            }
 
+                Toast.makeText(ConcernedMarchantPickupActivity.this,  "Api response Failed,Please try Again!",
+                        Toast.LENGTH_LONG).show();
+                Log.e("Response", e.toString());
+            } catch (IOException e) {
+
+                Toast.makeText(ConcernedMarchantPickupActivity.this,  "Api response Failed,Please try Again!",
+                        Toast.LENGTH_LONG).show();
+                Log.e("Response", e.toString());
+            } catch (JSONException e) {
+
+                Toast.makeText(ConcernedMarchantPickupActivity.this,  "Api response Failed,Please try Again!",
+                        Toast.LENGTH_LONG).show();
+                e.printStackTrace();
+            }
+            return "";
         }
+
 
 
         @Override
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
 
-            if (mJson.equals("[]")) {
+            if (mJson .equals("[]") ) {
 
-                Toast.makeText(ConcernedMarchantPickupActivity.this, "No data!",
+                Toast.makeText(ConcernedMarchantPickupActivity.this, "Login Failed,Please try Again!",
                         Toast.LENGTH_LONG).show();
 
 
             }
-            if(result.equals("success")) {
 
-                mAdapter = new ConcernedPickUpAdapter(modelBarcodeList);
-                Log.e("saadtest", modelBarcodeList.toString());
-                recyclerView.setAdapter(mAdapter);
-            }
-            else {
-                Toast.makeText(ConcernedMarchantPickupActivity.this, result,
-                        Toast.LENGTH_LONG).show();
-            }
+            mAdapter = new ConcernedPickUpAdapter(modelBarcodeList);
+            Log.e("saadtest",modelBarcodeList.toString());
+            recyclerView.setAdapter(mAdapter);
+
+
 
         }
     }
