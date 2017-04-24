@@ -1,6 +1,8 @@
 package com.example.com.wingsbangladesh.Activity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -18,6 +20,8 @@ import android.widget.Toast;
 import com.example.com.wingsbangladesh.Adapter.ConcernedPickUpAdapter;
 import com.example.com.wingsbangladesh.Model.ModelBarcodeList;
 import com.example.com.wingsbangladesh.R;
+import com.example.com.wingsbangladesh.util.ConstantURLs;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -47,6 +51,8 @@ public class ConcernedMarchantPickupActivity extends AppCompatActivity  {
     ImageView settings;
     String mJson;
     String usertype, userid, marchantcode,username,password,employeeName;
+    String URL="http://paperfly.com.bd/barcodeList.php";
+    SharedPreferences prefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +61,7 @@ public class ConcernedMarchantPickupActivity extends AppCompatActivity  {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.concerned_marchant_pickup_list);
+        prefs = getSharedPreferences(ConstantURLs.PREF_NAME, Context.MODE_PRIVATE);
 
         Intent intent=getIntent();
 
@@ -127,8 +134,11 @@ public class ConcernedMarchantPickupActivity extends AppCompatActivity  {
         @Override
         protected String doInBackground(String[]... data) {
             // Create a new HttpClient and Post Header
+
             HttpClient httpclient = new DefaultHttpClient();
-            HttpPost httppost = new HttpPost("http://paperfly.com.bd/barcodeList.php");
+            URL=prefs.getString(ConstantURLs.BARCODE_LIST_API_KEY, ConstantURLs.BARCODE_LIST_URL);
+
+            HttpPost httppost = new HttpPost(URL);
 
             try {
 
