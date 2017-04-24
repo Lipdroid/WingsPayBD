@@ -98,6 +98,7 @@ public class MarchantInfoActivity extends AppCompatActivity {
         }
         else{
             user.setText(" ");
+            //commit
 
         }
 
