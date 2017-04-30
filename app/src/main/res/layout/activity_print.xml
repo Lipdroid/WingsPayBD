@@ -150,7 +150,7 @@
         <ImageView
             android:id="@+id/barcode_img"
             android:layout_width="300dp"
-            android:layout_height="100dp"
+            android:layout_height="120dp"
              />
 
         <FrameLayout
