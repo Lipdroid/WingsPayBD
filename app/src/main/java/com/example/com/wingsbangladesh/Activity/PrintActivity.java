@@ -355,7 +355,7 @@ public class PrintActivity extends AppCompatActivity {
 
     private void printImage() {
         try {
-            bitmap = Bitmap.createScaledBitmap(targetImage, 300, 160, true);
+            bitmap = Bitmap.createScaledBitmap(targetImage, 300, 140, true);
             if (bitmap != null) {
                 bytes = PrintTools_58mm.decodeBitmap(bitmap);
                 sendData(bytes);
