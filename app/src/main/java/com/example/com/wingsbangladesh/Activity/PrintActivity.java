@@ -427,8 +427,8 @@ public class PrintActivity extends AppCompatActivity {
 
         @Override
         protected Boolean doInBackground(Void... uRls) {
+
             printImage();
-            //Disable bluetooth
             return null;
         }
 
@@ -490,9 +490,9 @@ public class PrintActivity extends AppCompatActivity {
                 @Override
                 public void onConnectionSuccess() {
                     mConnectingDlg.dismiss();
-
                     showConnected();
-                    new GetData().execute();
+                    //new GetData().execute();
+                    printImage();
 
                 }
 

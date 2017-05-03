@@ -123,13 +123,13 @@ public class P25Connector {
             long result = 0;
             
             try {
-            	mSocket			= device.createRfcommSocketToServiceRecord(UUID.fromString(SPP_UUID));
+            	mSocket	= device.createRfcommSocketToServiceRecord(UUID.fromString(SPP_UUID));
             	
             	mSocket.connect(); 
             	
-            	mOutputStream	= mSocket.getOutputStream();
-            	
-            	result = 1;
+            	mOutputStream= mSocket.getOutputStream();
+
+				result = 1;
             } catch (IOException e) { 
             	e.printStackTrace();
             	
