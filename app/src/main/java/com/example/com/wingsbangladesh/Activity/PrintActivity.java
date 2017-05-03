@@ -353,7 +353,7 @@ public class PrintActivity extends AppCompatActivity {
         }
     }
 
-    private void printImage() {
+    private synchronized void  printImage() {
         try {
             bitmap = Bitmap.createScaledBitmap(targetImage, 300, 140, true);
             if (bitmap != null) {
@@ -367,9 +367,13 @@ public class PrintActivity extends AppCompatActivity {
             targetImage = null;
             //  bitmap.recycle();
             bytes = null;
-            // finish();
+            //finish();
         } catch (Exception e) {
             e.printStackTrace();
+        }
+        finally {
+            
+            finish();
         }
     }
 
