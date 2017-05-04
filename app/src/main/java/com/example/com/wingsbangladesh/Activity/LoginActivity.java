@@ -30,6 +30,7 @@ import com.example.com.wingsbangladesh.Adapter.MarchantInfoAdapter;
 import com.example.com.wingsbangladesh.R;
 import com.example.com.wingsbangladesh.util.ConnectionDetector;
 import com.example.com.wingsbangladesh.util.ConstantURLs;
+import com.example.com.wingsbangladesh.util.GlobalUtils;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -73,6 +74,8 @@ public class LoginActivity extends AppCompatActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_login);
+
+        GlobalUtils.prev_connected_device = null;
 
         cd = new ConnectionDetector(this);
          prefs = getSharedPreferences(ConstantURLs.PREF_NAME, Context.MODE_PRIVATE);

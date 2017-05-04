@@ -34,6 +34,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.com.wingsbangladesh.util.ConstantURLs;
+import com.example.com.wingsbangladesh.util.GlobalUtils;
 import com.example.com.wingsbangladesh.util.P25ConnectionException;
 import com.example.com.wingsbangladesh.util.P25Connector;
 import com.example.com.wingsbangladesh.R;
@@ -70,6 +71,8 @@ public class PrintActivity extends AppCompatActivity {
     LinearLayout view = null;
     ImageView barcode_imageView = null;
     ImageView bmImage;
+
+    private boolean showtoast = true;
 
     private Button mConnectBtn, mEnableBtn;
     private Spinner mDeviceSp = null;
@@ -245,13 +248,29 @@ public class PrintActivity extends AppCompatActivity {
     }
 
     private void showToast(String message) {
-        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+        if(showtoast)
+            Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
     }
 
     private void updateDeviceList() {
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.simple_spinner_item, getArray(mDeviceList));
         adapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item);
         mDeviceSp.setAdapter(adapter);
+        if (GlobalUtils.prev_connected_device != null){
+            for (int i = 0; i< mDeviceList.size();i++){
+                BluetoothDevice device = mDeviceList.get(i);
+                if(device.getAddress().equals(GlobalUtils.prev_connected_device.getAddress())){
+
+                    showtoast = false;
+                    mDeviceSp.setSelection(i);
+                    connect();
+                    return;
+                }
+            }
+
+        }else{
+            showtoast = true;
+        }
         mDeviceSp.setSelection(0);
     }
 
@@ -282,7 +301,7 @@ public class PrintActivity extends AppCompatActivity {
     private void showConnected() {
         showToast("Connected");
 
-        mConnectBtn.setText("Disconnect");
+        mConnectBtn.setText("PRINT");
 
         // mPrintBarcodeBtn.setEnabled(true);
 
@@ -321,6 +340,7 @@ public class PrintActivity extends AppCompatActivity {
         try {
             if (!mConnector.isConnected()) {
                 mConnector.connect(device);
+                GlobalUtils.prev_connected_device = device;
             } else {
                 mConnector.disconnect();
 
@@ -353,7 +373,7 @@ public class PrintActivity extends AppCompatActivity {
         }
     }
 
-    private void printImage() {
+    private synchronized void printImage() {
         try {
             bitmap = Bitmap.createScaledBitmap(targetImage, 300, 140, true);
             if (bitmap != null) {
@@ -364,10 +384,7 @@ public class PrintActivity extends AppCompatActivity {
             } else {
                 System.out.println("SAADBITMAPIS NULL");
             }
-            targetImage = null;
-            //  bitmap.recycle();
-            bytes = null;
-            // finish();
+            finish();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -444,25 +461,12 @@ public class PrintActivity extends AppCompatActivity {
 
     private void connectToBluetooth() {
 
-
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
         if (mBluetoothAdapter == null) {
             showUnsupported();
         } else {
-            if (!mBluetoothAdapter.isEnabled()) {
-                showDisabled();
-            } else {
-                showEnabled();
 
-                Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
-
-                if (pairedDevices != null) {
-                    mDeviceList.addAll(pairedDevices);
-
-                    updateDeviceList();
-                }
-            }
 
             mProgressDlg = new ProgressDialog(this);
             mProgressDlg.setMessage("Scanning...");
@@ -484,12 +488,14 @@ public class PrintActivity extends AppCompatActivity {
 
                 @Override
                 public void onStartConnecting() {
-                    mConnectingDlg.show();
+                    if (showtoast)
+                        mConnectingDlg.show();
                 }
 
                 @Override
                 public void onConnectionSuccess() {
-                    mConnectingDlg.dismiss();
+                    if(showtoast)
+                        mConnectingDlg.dismiss();
                     showConnected();
                     //new GetData().execute();
                     printImage();
@@ -498,14 +504,16 @@ public class PrintActivity extends AppCompatActivity {
 
                 @Override
                 public void onConnectionFailed(String error) {
-                    mConnectingDlg.dismiss();
+                    if(showtoast)
+                        mConnectingDlg.dismiss();
 
 
                 }
 
                 @Override
                 public void onConnectionCancelled() {
-                    mConnectingDlg.dismiss();
+                    if(showtoast)
+                        mConnectingDlg.dismiss();
                 }
 
                 @Override
@@ -513,6 +521,20 @@ public class PrintActivity extends AppCompatActivity {
                     showDisonnected();
                 }
             });
+
+            if (!mBluetoothAdapter.isEnabled()) {
+                showDisabled();
+            } else {
+                showEnabled();
+
+                Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
+
+                if (pairedDevices != null) {
+                    mDeviceList.addAll(pairedDevices);
+
+                    updateDeviceList();
+                }
+            }
 
             mEnableBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
