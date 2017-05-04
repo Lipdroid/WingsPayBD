@@ -85,6 +85,7 @@ public class P25Connector {
 			mOutputStream.write(msg);
 			mOutputStream.flush();
 
+
 			Log.i(TAG, StringUtil.byteToString(msg));					
 		} catch(Exception e) {
 			throw new P25ConnectionException(e.getMessage());
@@ -121,12 +122,17 @@ public class P25Connector {
     
         protected Long doInBackground(URL... urls) {         
             long result = 0;
+
+
             
             try {
+
+			//	Log.d("TAG",)
+
             	mSocket	= device.createRfcommSocketToServiceRecord(UUID.fromString(SPP_UUID));
-            	
-            	mSocket.connect(); 
-            	
+
+            	mSocket.connect();
+
             	mOutputStream= mSocket.getOutputStream();
 
 				result = 1;
