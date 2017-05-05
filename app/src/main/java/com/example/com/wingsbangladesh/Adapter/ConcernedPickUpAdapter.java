@@ -5,17 +5,21 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.com.wingsbangladesh.Activity.PrintActivity;
+import com.example.com.wingsbangladesh.Activity.WorkingPrintActivity;
 import com.example.com.wingsbangladesh.Interface.ItemClickListener;
 import com.example.com.wingsbangladesh.Model.ModelBarcodeList;
 import com.example.com.wingsbangladesh.R;
+import com.example.com.wingsbangladesh.util.GlobalUtils;
 
 import java.util.List;
 
@@ -53,14 +57,14 @@ public class ConcernedPickUpAdapter extends RecyclerView.Adapter<ConcernedPickUp
              btn = (Button) view.findViewById(R.id.button);
 
             view.setTag(view);
-            view.setOnClickListener(this);
+           // view.setOnClickListener(this);
 
 
         }
 
         @Override
         public void onClick(View view) {
-            if (clickListener != null) clickListener.onClick(view, getAdapterPosition());
+
         }
     }
 
@@ -115,17 +119,19 @@ public class ConcernedPickUpAdapter extends RecyclerView.Adapter<ConcernedPickUp
        holder.btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-ModelBarcodeList p;
+                Toast.makeText(context, "Please wait..", Toast.LENGTH_LONG).show();
+                Log.e("pos",position+"");
+                ModelBarcodeList p;
                 p = barcodelist.get(position);
 
-                Intent intent = new Intent(context, PrintActivity.class);
+                Intent intent = new Intent(context, WorkingPrintActivity.class);
                 intent.putExtra("orderId", p.getOrderid());
                 intent.putExtra("marchantref", p.getMerOrderRef());
                 intent.putExtra("marchantcode", p.getMerchantCode());
                 intent.putExtra("productprice", p.getPackagePrice());
                 intent.putExtra("phone", p.getPhone());
                 intent.putExtra("barcode", p.getBarcode());
+
 
                context.startActivity(intent);
                // ((Activity)context).finish();*/

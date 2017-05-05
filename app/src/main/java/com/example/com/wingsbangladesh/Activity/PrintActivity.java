@@ -49,6 +49,7 @@ import com.onbarcode.barcode.android.IBarcode;
 import com.onbarcode.barcode.android.ITF14;
 import com.onbarcode.barcode.android.UPCA;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -152,7 +153,7 @@ public class PrintActivity extends AppCompatActivity {
 
         view.layout(0, 0, view.getMeasuredWidth(), view.getMeasuredHeight());
         view.buildDrawingCache(true);
-        targetImage = Bitmap.createBitmap(view.getDrawingCache());
+        //targetImage = Bitmap.createBitmap(view.getDrawingCache());
         view.setDrawingCacheEnabled(false); // clear drawing cache
 
 
@@ -248,7 +249,7 @@ public class PrintActivity extends AppCompatActivity {
     }
 
     private void showToast(String message) {
-        if(showtoast)
+        if (showtoast)
             Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
     }
 
@@ -256,10 +257,10 @@ public class PrintActivity extends AppCompatActivity {
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.simple_spinner_item, getArray(mDeviceList));
         adapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item);
         mDeviceSp.setAdapter(adapter);
-        if (GlobalUtils.prev_connected_device != null){
-            for (int i = 0; i< mDeviceList.size();i++){
+        if (GlobalUtils.prev_connected_device != null) {
+            for (int i = 0; i < mDeviceList.size(); i++) {
                 BluetoothDevice device = mDeviceList.get(i);
-                if(device.getAddress().equals(GlobalUtils.prev_connected_device.getAddress())){
+                if (device.getAddress().equals(GlobalUtils.prev_connected_device.getAddress())) {
 
                     showtoast = false;
                     mDeviceSp.setSelection(i);
@@ -268,7 +269,7 @@ public class PrintActivity extends AppCompatActivity {
                 }
             }
 
-        }else{
+        } else {
             showtoast = true;
         }
         mDeviceSp.setSelection(0);
@@ -373,14 +374,37 @@ public class PrintActivity extends AppCompatActivity {
         }
     }
 
-    private synchronized void printImage() {
+    private  void printImage() {
         try {
-            bitmap = Bitmap.createScaledBitmap(targetImage, 300, 140, true);
+            bitmap = Bitmap.createScaledBitmap(targetImage, 240, 105, true);
             if (bitmap != null) {
                 bytes = PrintTools_58mm.decodeBitmap(bitmap);
-                sendData(bytes);
+
+
+                byte[] paperfy_order_id_byte = Printer.printfont(orderId, FontDefine.FONT_32PX, FontDefine.Align_CENTER, (byte) 0x1A, PocketPos.LANGUAGE_ENGLISH);
+                byte[] mechantRefCode = Printer.printfont(marchantref + "|" + marchantcode, FontDefine.FONT_32PX, FontDefine.Align_CENTER, (byte) 0x1A, PocketPos.LANGUAGE_ENGLISH);
+                byte[] productPriceCustomerPhone = Printer.printfont(productprice + "|" + phone, FontDefine.FONT_32PX, FontDefine.Align_CENTER, (byte) 0x1A, PocketPos.LANGUAGE_ENGLISH);
+                byte[] four = Printer.printfont(barcode + "\n", FontDefine.FONT_32PX, FontDefine.Align_CENTER, (byte) 0x1A, PocketPos.LANGUAGE_ENGLISH);
+
+                byte[] singleLine = Printer.printfont("\n", FontDefine.FONT_32PX, FontDefine.Align_CENTER, (byte) 0x1A, PocketPos.LANGUAGE_ENGLISH);
+                byte[] fourLine = Printer.printfont("\n\n\n\n", FontDefine.FONT_32PX, FontDefine.Align_CENTER, (byte) 0x1A, PocketPos.LANGUAGE_ENGLISH);
                 byte[] newline = Printer.printfont("\n\n", FontDefine.FONT_32PX, FontDefine.Align_CENTER, (byte) 0x1A, PocketPos.LANGUAGE_ENGLISH);
-                sendData(newline);
+
+                sendData(fourLine);
+
+                sendData(paperfy_order_id_byte);
+                sendData(mechantRefCode);
+                sendData(productPriceCustomerPhone);
+
+                sendData(bytes);
+                //print1DBarcode();
+
+                sendData(singleLine);
+
+                sendData(four);
+
+                sendData(fourLine);
+
             } else {
                 System.out.println("SAADBITMAPIS NULL");
             }
@@ -494,7 +518,7 @@ public class PrintActivity extends AppCompatActivity {
 
                 @Override
                 public void onConnectionSuccess() {
-                    if(showtoast)
+                    if (showtoast)
                         mConnectingDlg.dismiss();
                     showConnected();
                     //new GetData().execute();
@@ -504,7 +528,7 @@ public class PrintActivity extends AppCompatActivity {
 
                 @Override
                 public void onConnectionFailed(String error) {
-                    if(showtoast)
+                    if (showtoast)
                         mConnectingDlg.dismiss();
 
 
@@ -512,7 +536,7 @@ public class PrintActivity extends AppCompatActivity {
 
                 @Override
                 public void onConnectionCancelled() {
-                    if(showtoast)
+                    if (showtoast)
                         mConnectingDlg.dismiss();
                 }
 
@@ -697,8 +721,9 @@ public class PrintActivity extends AppCompatActivity {
 
     private void generateUPCACode(String data) {
         //Create an image for drawing the barcodes
-        Bitmap barcode_image = Bitmap.createBitmap(230, 150, Bitmap.Config.ARGB_8888);
+        Bitmap barcode_image = Bitmap.createBitmap(240, 110, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(barcode_image);
+        canvas.drawColor(Color.WHITE);
 
         UPCA barcode = new UPCA();
 
@@ -743,6 +768,7 @@ public class PrintActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        targetImage = barcode_image;
         barcode_imageView.setImageBitmap(barcode_image);
 
 
@@ -769,6 +795,28 @@ public class PrintActivity extends AppCompatActivity {
 
     }
 
+    private void print1DBarcode() {
+        String content = barcode;
+
+        //1D barcode format (hex): 1d 6b 02 0d + barcode data
+
+        byte[] formats = {(byte) 0x1d, (byte) 0x6b, (byte) 0x02, (byte) 0x0d};
+        byte[] contents = content.getBytes();
+
+        byte[] bytes = new byte[formats.length + contents.length];
+
+        System.arraycopy(formats, 0, bytes, 0, formats.length);
+        System.arraycopy(contents, 0, bytes, formats.length, contents.length);
+
+        byte[] newline2 = Printer.printfont("\n\n\n", FontDefine.FONT_32PX, FontDefine.Align_CENTER, (byte) 0x1A, PocketPos.LANGUAGE_ENGLISH);
+
+        sendData(newline2);
+//      sendData(newline2);
+
+        sendData(bytes);
+
+
+    }
 
 }
 

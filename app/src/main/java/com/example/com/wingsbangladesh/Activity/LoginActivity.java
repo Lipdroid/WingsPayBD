@@ -91,6 +91,8 @@ public class LoginActivity extends AppCompatActivity {
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                username.setText("testa");
+                password.setText("testa$");
 
                 usernameText = username.getText().toString();
                 passwordText = password.getText().toString();
