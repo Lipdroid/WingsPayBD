@@ -119,23 +119,29 @@ public class ConcernedPickUpAdapter extends RecyclerView.Adapter<ConcernedPickUp
        holder.btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(context, "Please wait..", Toast.LENGTH_LONG).show();
-                Log.e("pos",position+"");
-                ModelBarcodeList p;
-                p = barcodelist.get(position);
+                if(!GlobalUtils.is_processing) {
+                    Toast.makeText(context, "Please wait..", Toast.LENGTH_LONG).show();
+                    Log.e("pos", position + "");
+                    ModelBarcodeList p;
+                    p = barcodelist.get(position);
 
-                Intent intent = new Intent(context, WorkingPrintActivity.class);
-                intent.putExtra("orderId", p.getOrderid());
-                intent.putExtra("marchantref", p.getMerOrderRef());
-                intent.putExtra("marchantcode", p.getMerchantCode());
-                intent.putExtra("productprice", p.getPackagePrice());
-                intent.putExtra("phone", p.getPhone());
-                intent.putExtra("barcode", p.getBarcode());
+                    Intent intent = new Intent(context, WorkingPrintActivity.class);
+                    intent.putExtra("orderId", p.getOrderid());
+                    intent.putExtra("marchantref", p.getMerOrderRef());
+                    intent.putExtra("marchantcode", p.getMerchantCode());
+                    intent.putExtra("productprice", p.getPackagePrice());
+                    intent.putExtra("phone", p.getPhone());
+                    intent.putExtra("barcode", p.getBarcode());
 
 
-               context.startActivity(intent);
-               // ((Activity)context).finish();*/
+                    context.startActivity(intent);
+                    // ((Activity)context).finish();*/
+                }else{
+                    Log.e("Already", "Processing");
+                    //Toast.makeText(context, "Please wait..,Already Processing", Toast.LENGTH_LONG).show();
+                }
             }
+
         });
 
 

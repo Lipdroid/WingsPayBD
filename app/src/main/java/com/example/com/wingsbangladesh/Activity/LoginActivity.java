@@ -76,6 +76,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         GlobalUtils.prev_connected_device = null;
+        GlobalUtils.is_processing = false;
 
         cd = new ConnectionDetector(this);
          prefs = getSharedPreferences(ConstantURLs.PREF_NAME, Context.MODE_PRIVATE);

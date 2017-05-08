@@ -81,6 +81,7 @@ public class WorkingPrintActivity extends AppCompatActivity {
         super.onDestroy();
         try {
             closeBT();
+            GlobalUtils.is_processing = false;
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -120,6 +121,7 @@ public class WorkingPrintActivity extends AppCompatActivity {
                 try {
                     connectWithSelectedDevice();
                     printImage();
+                    GlobalUtils.is_processing = false;
                     finish();
                 } catch (IOException ex) {
                     ex.printStackTrace();
@@ -243,22 +245,28 @@ public class WorkingPrintActivity extends AppCompatActivity {
                 byte[] fourLine = Printer.printfont("\n\n\n\n", FontDefine.FONT_32PX, FontDefine.Align_CENTER, (byte) 0x1A, PocketPos.LANGUAGE_ENGLISH);
                 byte[] newline = Printer.printfont("\n\n", FontDefine.FONT_32PX, FontDefine.Align_CENTER, (byte) 0x1A, PocketPos.LANGUAGE_ENGLISH);
 
+                //Print two line spaces
                 sendData(newline);
 
-                sendData(one);
-                sendData(two);
+                //Print orderid,merchantReference Code,phone
                 sendData(three);
+                sendData(two);
+                sendData(one);
 
+                //Print two line spaces
                 sendData(newline);
                 sendData(newline);
 
+                //Print barcode image
                 sendData(bytes);
-                //print1DBarcode();
 
+                //Print one line space
                 sendData(singleLine);
 
+                //Print barcode data
                 sendData(four);
 
+                //Print four line spaces
                 sendData(fourLine);
 
             } else {

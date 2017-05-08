@@ -57,6 +57,14 @@ import java.util.Set;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
+/*
+
+* no need of this Activity
+* This Activity has problems
+* WorkingPritActivity is the main printing Activity
+*
+* */
+
 
 public class PrintActivity extends AppCompatActivity {
 
@@ -374,7 +382,7 @@ public class PrintActivity extends AppCompatActivity {
         }
     }
 
-    private  void printImage() {
+    private void printImage() {
         try {
             bitmap = Bitmap.createScaledBitmap(targetImage, 240, 105, true);
             if (bitmap != null) {
